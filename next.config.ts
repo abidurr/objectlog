@@ -4,7 +4,9 @@ const nextConfig: NextConfig = {
   /* config options here */
   basePath: "/objectlog",
   output: "export",
-  distDir: "dist",
+  // distDir: "dist",
+  assetPrefix: "/objectlog/",
+  images: { unoptimized: true },
   experimental: {
     agentFeedback: true,
   },
