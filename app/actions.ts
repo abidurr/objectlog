@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+// import { revalidatePath } from "next/cache";
 
 // READ actions
 export async function getUsers() {
@@ -12,12 +12,10 @@ export async function getUsers() {
       },
     });
 
-    revalidatePath("/users");
+    // revalidatePath("/users");
 
     return users;
   } catch (error: unknown) {
     throw new Error((error as Error).message);
   }
 }
-
-// test deploy
