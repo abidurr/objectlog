@@ -15,7 +15,7 @@ export async function getUsers() {
     revalidatePath("/users");
 
     return users;
-  } catch (error) {
-    throw new Error(error.message);
+  } catch (error: unknown) {
+    throw new Error((error as Error).message);
   }
 }
