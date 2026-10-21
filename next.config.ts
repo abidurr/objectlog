@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   basePath: process.env.ENVIRONMENT === "local" ? "" : "/objectlog",
-  output: "export",
+  // output: "export",
   // distDir: "dist",
   assetPrefix: process.env.ENVIRONMENT === "local" ? "" : "/objectlog/",
   images: { unoptimized: true },
