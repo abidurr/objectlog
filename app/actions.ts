@@ -12,8 +12,10 @@ export async function getUsers() {
       },
     });
 
+    revalidatePath("/users");
+
     return users;
   } catch (error) {
-    throw new Error("Failed to fetch users");
+    throw new Error(error.message);
   }
 }
