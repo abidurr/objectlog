@@ -2,10 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  basePath: process.env.ENVIRONMENT === "local" ? "" : "/objectlog",
+  // basePath: process.env.ENVIRONMENT === "local" ? "" : "/objectlog",
   // output: "export",
   // distDir: "dist",
-  assetPrefix: process.env.ENVIRONMENT === "local" ? "" : "/objectlog/",
+  // assetPrefix: process.env.ENVIRONMENT === "local" ? "" : "/objectlog/",
   images: { unoptimized: true },
   experimental: {
     agentFeedback: true,
