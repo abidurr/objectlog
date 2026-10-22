@@ -18,13 +18,17 @@ model User {
   email     String   @unique
   username  String?
   name      String?
+  objects   Object[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@map("users")
 }
 
 model Object {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+  fields   Field[] 
   @@map("objects")
 }
 
@@ -36,8 +40,10 @@ model Organization {
 }
 
 model Field {
-  id  String               @id @default(auto()) @map("_id") @db.ObjectId
-  name String
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  objectId  String    @db.ObjectId
+  object    Object    @relation(fields: [objectId], references: [id])
 
   @@map("fields")
 }

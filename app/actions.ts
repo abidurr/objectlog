@@ -20,11 +20,11 @@ export async function getUsers() {
   }
 }
 
-export async function getObjects(id: string) {
+export async function getObjects(userId: string) {
   try {
     const objects = await prisma.object.findMany({
       where: {
-        id: id,
+        userId: userId,
       },
       orderBy: {
         createdAt: "desc",
