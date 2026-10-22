@@ -106,19 +106,20 @@ export const Header = () => {
         <li
           style={{
             backgroundColor:
-              pathname == "/fields" ? ACTIVE_TAB_COLOR : INACTIVE_TAB_COLOR,
-          }}
-        >
-          <Link href="/fields">Fields</Link>
-        </li>
-        <li
-          style={{
-            backgroundColor:
               pathname == "/objects" ? ACTIVE_TAB_COLOR : INACTIVE_TAB_COLOR,
           }}
         >
           <Link href="/objects">Objects</Link>
         </li>
+        <li
+          style={{
+            backgroundColor:
+              pathname == "/fields" ? ACTIVE_TAB_COLOR : INACTIVE_TAB_COLOR,
+          }}
+        >
+          <Link href="/fields">Fields</Link>
+        </li>
+
         <li
           style={{
             backgroundColor:
