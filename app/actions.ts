@@ -60,7 +60,7 @@ export async function getAllFields(userId: string) {
   try {
     const fields = await prisma.field.findMany({
       where: {
-        userId: { equals: userId },
+        object: { userId },
       },
       // orderBy: {
       //   createdAt: "desc",

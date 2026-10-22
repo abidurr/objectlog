@@ -1,16 +1,10 @@
-import React from "react";
+import type { getUsers } from "@/app/actions";
 
-// interface UserType {
-//   id: string;
-//   email: string;
-//   username?: string;
-//   name?: string;
-//   objects: any[];
-//   createdAt: datetime;
-//   updatedAt: DateTime;
-// }
-
-const UserList = async ({ users }: { users: unknown[] }) => {
+const UserList = ({
+  users,
+}: {
+  users: Awaited<ReturnType<typeof getUsers>>;
+}) => {
   return (
     <ul>
       {users?.map((user) => (

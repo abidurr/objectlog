@@ -1,13 +1,12 @@
 "use client";
-import { useAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { isLoggedInAtom } from "@/components/atoms";
-import { Container, Header } from "@/components/";
-import { getObjects } from "@/app/actions";
-import { useState, useEffect } from "react";
+import type { getObjects } from "@/app/actions";
+import { useState } from "react";
 
 const ObjectsList = () => {
-  const [isLoggedIn, setIsLoggedIn] = useAtom(isLoggedInAtom);
-  const [objects, setObjects] = useState<unknown[]>([]);
+  const [isLoggedIn] = useAtomValue(isLoggedInAtom);
+  const [objects] = useState<Awaited<ReturnType<typeof getObjects>>>([]);
 
   if (!isLoggedIn) {
     return (
