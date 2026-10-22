@@ -10,7 +10,7 @@ const Login = () => {
     if (isLoggedIn) {
       // Logout logic
       setIsLoggedIn(false);
-      setLoggedInUser(null);
+      setLoggedInUser(undefined);
     } else {
       // Login logic
       setIsLoggedIn(true);

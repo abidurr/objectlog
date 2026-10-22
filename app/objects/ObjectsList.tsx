@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 
 const ObjectsList = () => {
   const [isLoggedIn, setIsLoggedIn] = useAtom(isLoggedInAtom);
-  const [objects, setObjects] = useState([]);
+  const [objects, setObjects] = useState<unknown[]>([]);
 
   if (!isLoggedIn) {
     return (
@@ -19,10 +19,9 @@ const ObjectsList = () => {
     return (
       <>
         <p>These are the objects you made:</p>
-        {objects.map((object) => (
+        {objects?.map((object) => (
           <div key={object.id}>
             <h3>{object.name}</h3>
-            <p>{object.description}</p>
           </div>
         ))}
       </>
