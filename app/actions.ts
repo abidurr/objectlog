@@ -7,9 +7,9 @@ import prisma from "@/lib/prisma";
 export async function getUsers() {
   try {
     const users = await prisma.user.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
+      // orderBy: {
+      //   createdAt: "desc",
+      // },
     });
 
     // revalidatePath("/users");
@@ -26,9 +26,9 @@ export async function getObjects(userId: string) {
       where: {
         userId: userId,
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      // orderBy: {
+      //   createdAt: "desc",
+      // },
     });
 
     // revalidatePath("/users");
@@ -45,9 +45,9 @@ export async function getFields(objectId: string) {
       where: {
         objectId: objectId,
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      // orderBy: {
+      //   createdAt: "desc",
+      // },
     });
 
     return fields;
@@ -60,11 +60,11 @@ export async function getAllFields(userId: string) {
   try {
     const fields = await prisma.field.findMany({
       where: {
-        userId: userId,
+        userId: { equals: userId },
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      // orderBy: {
+      //   createdAt: "desc",
+      // },
     });
 
     return fields;
