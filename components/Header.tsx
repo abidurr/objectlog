@@ -106,14 +106,6 @@ export const Header = () => {
         <li
           style={{
             backgroundColor:
-              pathname == "/motivation" ? ACTIVE_TAB_COLOR : INACTIVE_TAB_COLOR,
-          }}
-        >
-          <Link href="/motivation">Motivation</Link>
-        </li>
-        <li
-          style={{
-            backgroundColor:
               pathname == "/fields" ? ACTIVE_TAB_COLOR : INACTIVE_TAB_COLOR,
           }}
         >
@@ -152,6 +144,14 @@ export const Header = () => {
           }}
         >
           <Link href="/users">Users</Link>
+        </li>
+        <li
+          style={{
+            backgroundColor:
+              pathname == "/about" ? ACTIVE_TAB_COLOR : INACTIVE_TAB_COLOR,
+          }}
+        >
+          <Link href="/about">About</Link>
         </li>
       </ul>
     </StyledNav>

@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-
+import Link from "next/link";
 import { styled } from "styled-components";
 import { Header, Container } from "@/components/index";
 
@@ -9,8 +9,36 @@ export default function Home() {
     <>
       <Header />
       <Container>
-        <h1>Home page</h1>
+        <h1>ObjectLog</h1>
+        <h3>Objects & Logs. Everything you need to manage your data.</h3>
+        <StyledPara>
+          Everyone needs a different solution for the things they want to
+          remember. It could be books, shows, people, events, or whatever. All
+          you need is to decide what you want to remember. Create an{" "}
+          <Link href="/objects">object</Link> for anything you want and give it
+          any{" "}
+          <Link href="/fields" style={{ color: "lightgreen" }}>
+            fields
+          </Link>{" "}
+          you want. Then add all the items you want to remember. It really can
+          be as simple as that.
+        </StyledPara>
       </Container>
     </>
   );
 }
+
+const StyledPara = styled.p`
+  text-align: justify;
+  a {
+    color: lightgreen;
+    text-decoration: none;
+  }
+  a:visited {
+    color: lightgreen;
+  }
+  a:hover {
+    color: lightgreen;
+    text-decoration: underline;
+  }
+`;
