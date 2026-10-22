@@ -1,6 +1,16 @@
 import React from "react";
 
-const UserList = async ({ users }: { users: any[] }) => {
+interface UserType {
+  id: string;
+  email: string;
+  username?: string;
+  name?: string;
+  objects: object[];
+  createdAt: datetime;
+  updatedAt: DateTime;
+}
+
+const UserList = async ({ users }: { users: UserType[] }) => {
   return (
     <ul>
       {users.map((user) => (
