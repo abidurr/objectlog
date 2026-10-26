@@ -20,20 +20,25 @@ export async function getUsers() {
   }
 }
 
-export async function getObjects(userId: string) {
+export async function getObjects(userEmail: string) {
   try {
-    const objects = await prisma.object.findMany({
+    const email = await prisma.user.findMany({
       where: {
-        userId: userId,
+        email: userEmail,
       },
-      // orderBy: {
-      //   createdAt: "desc",
-      // },
     });
 
-    // revalidatePath("/users");
-
-    return objects;
+    const userId = email.pop().id;
+    if (!!userId) {
+      const objects = await prisma.object.findMany({
+        where: {
+          userId,
+        },
+      });
+      return objects;
+    } else {
+      return [];
+    }
   } catch (error: unknown) {
     throw new Error((error as Error).message);
   }
