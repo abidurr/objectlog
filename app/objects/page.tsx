@@ -11,7 +11,7 @@ import { getObjects } from "@/app/actions";
 async function ObjectsContent() {
   const session = await auth0.getSession();
 
-  const userEmail = session.user.email; // "admin@test.com";
+  const userEmail = session?.user?.email ?? ""; // "admin@test.com";
   const objects = await getObjects(userEmail);
   return <ObjectsList objects={objects} />;
 }
