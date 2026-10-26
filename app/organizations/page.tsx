@@ -1,7 +1,9 @@
 import { Header, Container } from "@/components";
 import Image from "next/image";
 
-export default function Organizations() {
+
+
+export default async function Organizations() {
   return (
     <>
       <Header />

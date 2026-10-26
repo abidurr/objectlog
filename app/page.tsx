@@ -4,6 +4,7 @@ import Link from "next/link";
 import { styled } from "styled-components";
 import { Suspense } from "react";
 import { Header, Container, Login } from "@/components/index";
+import { LoggedInUser } from "@/components/LoggedInUser";
 
 export default function Home() {
   return (
@@ -24,6 +25,9 @@ export default function Home() {
           you want. Then add all the items you want to remember. It really can
           be as simple as that.
         </StyledPara>
+        <Suspense fallback={<div>Loading user...</div>}>
+          <LoggedInUser />
+        </Suspense>
       </Container>
     </>
   );
