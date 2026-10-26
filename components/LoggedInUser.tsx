@@ -1,5 +1,4 @@
 import { auth0 } from "@/lib/auth0";
-import { setAtomValue} from "jotai"
 
 const LoggedInUser = async () => {
   const session = await auth0.getSession();
