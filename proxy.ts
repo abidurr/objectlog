@@ -1,6 +1,7 @@
+import type { NextRequest } from "next/server";
 import { auth0 } from "./lib/auth0";
 
-export async function proxy(request) {
+export async function proxy(request: NextRequest) {
   const authResponse = await auth0.middleware(request);
 
   // Always return the auth response.
@@ -13,6 +14,12 @@ export async function proxy(request) {
 
 export const config = {
   matcher: [
+    /*
+     * Match all request paths except for:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
+     */
     "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
   ],
 };
