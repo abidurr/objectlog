@@ -1,4 +1,4 @@
-import { Header, Container, UserList } from "@/components";
+import { Header, Container, UserList, LoggedInUser } from "@/components";
 import Image from "next/image";
 import { getUsers } from "@/app/actions";
 import { Suspense } from "react";
@@ -13,7 +13,11 @@ export default async function Users() {
     <>
       <Header />
       <Container>
-        <h1>Users page</h1>
+        <h1>User profile</h1>
+        <Suspense fallback={<div>Loading user...</div>}>
+          <LoggedInUser />
+        </Suspense>
+        <h1>All users</h1>
         <Suspense fallback={<div>Loading users...</div>}>
           <UsersContent />
         </Suspense>

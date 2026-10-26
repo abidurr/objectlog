@@ -17,13 +17,11 @@ const LoggedInUser = async () => {
   return (
     <>
       <p>Logged in as {session.user.email}</p>
-
-      {/* Display user info (name, email, etc.) */}
-      <h1>User Profile</h1>
       <pre>{JSON.stringify(session, null, 2)}</pre>
 
-      {/* Ends the session and redirects to Auth0 to log out */}
-      <a href="/auth/logout">Logout</a>
+      <a href="/auth/logout">
+        <button>Logout</button>
+      </a>
     </>
   );
 };
