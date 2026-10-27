@@ -28,17 +28,17 @@ export async function getObjects(userEmail: string) {
       },
     });
 
-    const userId = email.pop().id;
-    if (!!userId) {
-      const objects = await prisma.object.findMany({
-        where: {
-          userId,
-        },
-      });
-      return objects;
-    } else {
+    const user = email.pop();
+    if (!user) {
       return [];
     }
+
+    const objects = await prisma.object.findMany({
+      where: {
+        userId: user.id,
+      },
+    });
+    return objects;
   } catch (error: unknown) {
     throw new Error((error as Error).message);
   }
