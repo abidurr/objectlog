@@ -142,6 +142,16 @@ export const Header = () => {
         <li
           style={{
             backgroundColor:
+              pathname == "/documentation"
+                ? ACTIVE_TAB_COLOR
+                : INACTIVE_TAB_COLOR,
+          }}
+        >
+          <Link href="/documentation">Documentation</Link>
+        </li>
+        <li
+          style={{
+            backgroundColor:
               pathname == "/users" ? ACTIVE_TAB_COLOR : INACTIVE_TAB_COLOR,
           }}
         >
