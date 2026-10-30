@@ -3,10 +3,11 @@
 import { styled } from "styled-components";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { theme } from ".";
 
-const ACTIVE_TAB_COLOR = "rgba(10, 150, 0, 0.2)";
-const INACTIVE_TAB_COLOR = "rgba(10, 150, 0, 0.4)";
-const HOVER_TAB_COLOR = "rgba(10, 150, 0, 0.8)";
+const ACTIVE_TAB_COLOR = `${theme.PRIMARY_300}`;
+const INACTIVE_TAB_COLOR = `${theme.PRIMARY_700}`;
+const HOVER_TAB_COLOR = `${theme.PRIMARY_500}`;
 
 const StyledNav = styled.div`
   /* background-color: rgb(10, 153, 3); */
@@ -17,7 +18,7 @@ const StyledNav = styled.div`
   font-size: 12px;
   top: 24px;
   font-size: 1em;
-  border-radius: 16px;
+  border-radius: 4px;
   margin: 0px auto;
 
   ul {
@@ -26,8 +27,8 @@ const StyledNav = styled.div`
     padding: 0;
     list-style: none;
     overflow: hidden;
-    background-color: rgba(5, 150, 3, 0.4);
-    border-radius: 16px;
+    /* background-color: rgba(5, 150, 3, 0.4); */
+    border-radius: 4px;
     display: flex;
     width: fit-content;
     align-items: center;
@@ -36,7 +37,7 @@ const StyledNav = styled.div`
   }
 
   ul a {
-    color: #ffffff;
+    color: ${theme.PRIMARY_800};
     display: block;
     outline: 1px solid rgba(10, 150, 0, 0.4);
     padding: 12px 28px;
@@ -49,11 +50,11 @@ const StyledNav = styled.div`
   }
   li:hover {
     background-color: ${HOVER_TAB_COLOR};
-    opacity: 0.5;
+    opacity: 0.8;
     transition: ease-out 300ms;
   }
   li:first-child {
-    border-radius: 16px 0 0 16px;
+    border-radius: 4px 0 0 4px;
   }
 
   /* .active {
@@ -62,14 +63,14 @@ const StyledNav = styled.div`
   } */
 
   li:last-child {
-    border-radius: 0 16px 16px 0;
+    border-radius: 0 4px 4px 0;
   }
   ul:hover {
     /* color: rgba(10, 150, 0, 0.6);
     transition: ease-in 400ms; */
   }
   a:active {
-    background-color: rgba(10, 150, 0, 0.6);
+    background-color: ${HOVER_TAB_COLOR};
     transition: ease-in 400ms;
   }
 
