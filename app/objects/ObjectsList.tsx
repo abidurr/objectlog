@@ -3,6 +3,8 @@ import { useAtom } from "jotai";
 import { isLoggedInAtom } from "@/components/atoms";
 import type { getObjects } from "@/app/actions";
 import { useState } from "react";
+import Link from "next/link";
+import styled from "styled-components";
 
 const ObjectsList = ({
   objects,
@@ -21,16 +23,27 @@ const ObjectsList = ({
   // } else {
 
   return (
-    <>
+    <StyledObjects>
       <p>These are the objects you made:</p>
       {objects?.map((object) => (
         <div key={object.id}>
-          <h3>{JSON.stringify(object)}</h3>
+          <>
+            <Link href={`/objects/${object?.id}`}>
+              <h3>{object?.name}</h3>
+            </Link>
+          </>
         </div>
       ))}
-    </>
+    </StyledObjects>
   );
   // }
 };
+
+const StyledObjects = styled.div`
+  a {
+    color: white;
+    text-decoration: none;
+  }
+`;
 
 export { ObjectsList };
