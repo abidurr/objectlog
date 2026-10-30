@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Onest } from "next/font/google";
+import { theme } from "../components/theme";
 
 export const metadata: Metadata = {
   title: "ObjectLog",
@@ -18,8 +19,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${onest.variable} h-full antialiased`}
       style={{
-        backgroundColor: "#112512",
-        color: "white",
+        backgroundColor: `${theme.BACKGROUND_COLOR}`,
+        color: `${theme.PRIMARY_200}`,
         fontFamily: `var(--font-onest), sans-serif`,
       }}
     >
