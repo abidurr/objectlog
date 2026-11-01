@@ -6,12 +6,12 @@ export default function Documentation() {
     <>
       <Header />
       <Container>
-        <h1>Doc page</h1>
-        <p>Make the objects you want</p>
-        <p>Add fields to each object</p>
-        <p>Add records for each object</p>
-        <p>Add the fields for each record</p>
-        <p>Use views to see all your data</p>
+        <h1>Documentation</h1>
+        <p>Make the Bbjects you need.</p>
+        <p>Add Fields to the object.</p>
+        <p>Add Records for each object.</p>
+        <p>Add the Fields for each record.</p>
+        <p>Use Views to organize all your data.</p>
         <p></p>
       </Container>
     </>
