@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
   // distDir: "dist",
   // assetPrefix: process.env.ENVIRONMENT === "local" ? "" : "/objectlog/",
   images: { unoptimized: true },
+  compiler: {
+    styledComponents: true,
+  },
   experimental: {
     agentFeedback: true,
   },

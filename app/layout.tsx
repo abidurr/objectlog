@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Onest } from "next/font/google";
 import { theme } from "../components/theme";
+import StyledComponentsRegistry from "../lib/registry";
 
 export const metadata: Metadata = {
   title: "ObjectLog",
@@ -24,7 +25,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         fontFamily: `var(--font-onest), sans-serif`,
       }}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <StyledComponentsRegistry>{children}</StyledComponentsRegistry>
+      </body>
     </html>
   );
 }
