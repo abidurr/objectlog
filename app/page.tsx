@@ -12,7 +12,8 @@ export default function Home() {
       <Header />
       <Container>
         <h1>ObjectLog</h1>
-        <h3>Objects & Logs. Everything you need to manage your data.</h3>
+        <h3>Objects & Logs.</h3>
+        <h3>Everything you need to manage your data.</h3>
         <StyledPara>
           Everyone needs a different solution for the things they want to
           remember. It could be books, shows, people, events, or whatever. All
