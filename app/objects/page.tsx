@@ -6,10 +6,10 @@ import { Suspense } from "react";
 import { ObjectsList } from "./ObjectsList";
 import { Login } from "@/components/Login";
 import { auth0 } from "@/lib/auth0";
-import { getObjects, createObject } from "@/app/actions";
+import { getObjects } from "@/app/actions";
 import Link from "next/link";
 import styled from "styled-components";
-import { theme } from "../../components/";
+import { theme, CreateObject } from "../../components/";
 
 const HOVER_TAB_COLOR = theme.PRIMARY_600;
 
@@ -18,14 +18,6 @@ async function ObjectsContent() {
 
   const userEmail = session?.user?.email ?? ""; // "admin@test.com";
   const objects = await getObjects(`${userEmail}`?.toLowerCase());
-
-  const createNewObject = async (inputName: string) => {
-    return await createObject({
-      userId: session.user.id,
-      email: ession?.user?.email,
-      input: { name: inputName, fields: [] },
-    });
-  };
 
   if (!session) {
     return (
@@ -60,13 +52,7 @@ async function ObjectsContent() {
         )}
       </UserNav>
       <ObjectsList objects={objects} />
-      <h3>Create new object</h3>
-      <p>Name</p>
-      <input
-        value={objectName}
-        onChange={(e) => setObjectName(e.target.value)}
-      />
-      <button onClick={() => createNewObject()} />
+      <CreateObject session={session} />
     </>
   );
 }
