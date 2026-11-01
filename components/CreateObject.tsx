@@ -32,12 +32,18 @@ const CreateObject = ({ session }: CreateObjectProps) => {
   return (
     <>
       <h3>Create new object</h3>
-      <p>Name</p>
       <input
+        style={{ width: "232px" }}
+        placeholder="Object name, e.g. 'Book', 'Friend' etc."
         value={objectName}
         onChange={(e) => setObjectName(e.target.value)}
       />
-      <button onClick={() => createNewObject(objectName)} />
+      <button
+        onClick={async () => await createNewObject(objectName)}
+        disabled={!objectName}
+      >
+        Create
+      </button>
     </>
   );
 };
