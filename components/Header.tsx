@@ -3,7 +3,7 @@
 import { styled } from "styled-components";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { theme } from ".";
+import { theme } from "./theme";
 
 const ACTIVE_TAB_COLOR = `${theme.PRIMARY_300}`;
 const INACTIVE_TAB_COLOR = `${theme.PRIMARY_700}`;
@@ -37,7 +37,7 @@ const StyledNav = styled.div`
   }
 
   ul a {
-    color: ${theme.PRIMARY_200};
+    color: ${theme.BLACK_TEXT_COLOR};
     display: block;
     outline: 1px solid rgba(10, 150, 0, 0.4);
     padding: 12px 28px;
