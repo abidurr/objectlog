@@ -1,14 +1,31 @@
 "use client";
 
 import { useState } from "react";
+import { createObject } from "@/app/actions";
 
-const CreateObject = (session: unknown) => {
+type CreateObjectProps = {
+  session: {
+    user?: {
+      id?: string;
+      email?: string;
+    };
+  } | null;
+};
+
+const CreateObject = ({ session }: CreateObjectProps) => {
   const [objectName, setObjectName] = useState("");
 
   const createNewObject = async (inputName: string) => {
+    const userId = session?.user?.id;
+    const email = session?.user?.email;
+
+    if (!userId || !email) {
+      return;
+    }
+
     return await createObject({
-      userId: session?.user?.id,
-      email: session?.user?.email,
+      userId,
+      email,
       input: { name: inputName, fields: [] },
     });
   };

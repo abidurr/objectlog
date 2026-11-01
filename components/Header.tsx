@@ -37,7 +37,7 @@ const StyledNav = styled.div`
   }
 
   ul a {
-    color: ${theme.PRIMARY_800};
+    color: ${theme.PRIMARY_200};
     display: block;
     outline: 1px solid rgba(10, 150, 0, 0.4);
     padding: 12px 28px;

@@ -39,12 +39,14 @@ async function ObjectsContent() {
             </li> */}
             <li>
               <UserInfoSection>
-                <Image
-                  src={session?.user?.picture}
-                  alt="user logo"
-                  width={32}
-                  height={32}
-                />
+                {session?.user?.picture && (
+                  <Image
+                    src={session?.user?.picture}
+                    alt="user logo"
+                    width={32}
+                    height={32}
+                  />
+                )}
                 <Link href="/objects">{session?.user?.name}</Link>
               </UserInfoSection>
             </li>
