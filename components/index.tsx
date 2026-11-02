@@ -3,5 +3,6 @@ export * from "./Header";
 export * from "./UserList";
 export * from "./Login";
 export * from "./LoggedInUser";
+export * from "./UserNavigation";
 export * from "./theme";
 export * from "./CreateObject";

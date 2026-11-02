@@ -102,6 +102,23 @@ export async function getObjects(userEmail: string) {
   }
 }
 
+export async function getObject(objectId: string) {
+  try {
+    const object = await prisma.object.findUnique({
+      where: {
+        id: objectId,
+      },
+      include: {
+        fields: true,
+      },
+    });
+
+    return object;
+  } catch (error: unknown) {
+    throw new Error((error as Error).message);
+  }
+}
+
 export async function getFields(objectId: string) {
   try {
     const fields = await prisma.field.findMany({
