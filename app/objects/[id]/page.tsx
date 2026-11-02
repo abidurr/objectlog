@@ -36,7 +36,7 @@ async function ObjectDetails({ id }: { id: string }) {
   return (
     <ObjectBox>
       <IconAndTitle>
-        <LetterIcon color={object?.color}>
+        <LetterIcon color={object?.color ?? undefined}>
           {object?.name?.charAt(0).toUpperCase()}
         </LetterIcon>
         <h3>{object?.name}</h3>
@@ -51,9 +51,9 @@ async function ObjectDetails({ id }: { id: string }) {
         <p>color: {object?.color}</p>
         <dd>{object?.name ?? "Not found"}</dd>
         <dt>updatedAt</dt>
-        <dd>{new Date(object?.updatedAt).toLocaleDateString()}</dd>
+        <dd>{object?.updatedAt?.toLocaleDateString() ?? "Not available"}</dd>
         <dt>createdAt</dt>
-        <dd>{new Date(object?.createdAt).toLocaleDateString()}</dd>
+        <dd>{object?.createdAt?.toLocaleDateString() ?? "Not available"}</dd>
         <dt>color</dt>
         <dd>{object?.color}</dd>
         <dt>Fields</dt>

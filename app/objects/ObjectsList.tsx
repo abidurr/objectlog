@@ -32,7 +32,7 @@ const ObjectsList = ({
           <Link href={`/objects/${object?.id}`}>
             <ObjectBox>
               <IconAndTitle>
-                <LetterIcon color={object?.color}>
+                <LetterIcon color={object?.color ?? undefined}>
                   {object?.name?.charAt(0).toUpperCase()}
                 </LetterIcon>
                 <h3>{object?.name}</h3>
@@ -41,10 +41,12 @@ const ObjectsList = ({
               <p>ID: {object?.id}</p>
               <p>Name: {object?.name}</p>
               <p>
-                updatedAt: {new Date(object?.updatedAt).toLocaleDateString()}
+                updatedAt:{" "}
+                {object.updatedAt?.toLocaleDateString() ?? "Not available"}
               </p>
               <p>
-                createdAt: {new Date(object?.createdAt).toLocaleDateString()}
+                createdAt:{" "}
+                {object.createdAt?.toLocaleDateString() ?? "Not available"}
               </p>
               <p>color: {object?.color}</p>
             </ObjectBox>
