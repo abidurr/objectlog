@@ -8,9 +8,9 @@ import { theme } from "../components/theme";
 
 export default function Home() {
   return (
-    <>
+    <StyledPage>
       <Header />
-      <Container>
+      <StyledMain>
         <h1>ObjectLog</h1>
         <h3>Objects & Logs.</h3>
         <h3>Everything you need to manage your data.</h3>
@@ -26,10 +26,46 @@ export default function Home() {
           you want. Then add all the items you want to remember. It really can
           be as simple as that.
         </StyledPara>
-      </Container>
-    </>
+        <StyledPara>Work in progress 🚧</StyledPara>
+        <StyledFooter>
+          <StyledPara>
+            Made with ❤️ by{" "}
+            <a
+              href="https://abidur.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              abidur.dev
+            </a>
+          </StyledPara>
+        </StyledFooter>
+      </StyledMain>
+    </StyledPage>
   );
 }
+
+const StyledPage = styled.div`
+  display: flex;
+  min-height: 98vh;
+  flex-direction: column;
+`;
+
+const StyledMain = styled(Container)`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin-bottom: 24px;
+`;
+
+const StyledFooter = styled.footer`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  text-align: center;
+`;
 
 const StyledPara = styled.p`
   text-align: justify;
