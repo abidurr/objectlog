@@ -3,31 +3,27 @@
 import { useState } from "react";
 import { createObject } from "@/app/actions";
 
-type CreateObjectProps = {
-  session: {
-    user?: {
-      id?: string;
-      email?: string;
-    };
-  } | null;
-};
-
-const CreateObject = ({ session }: CreateObjectProps) => {
+const CreateObject = () => {
   const [objectName, setObjectName] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+  const [error, setError] = useState("");
 
-  const createNewObject = async (inputName: string) => {
-    const userId = session?.user?.id;
-    const email = session?.user?.email;
-
-    if (!userId || !email) {
+  const createNewObject = async () => {
+    const name = objectName.trim();
+    if (!name || isCreating) {
       return;
     }
 
-    return await createObject({
-      userId,
-      email,
-      input: { name: inputName, fields: [] },
-    });
+    setIsCreating(true);
+    setError("");
+    try {
+      await createObject({ input: { name, fields: [] } });
+      setObjectName("");
+    } catch {
+      setError("Could not create object. Please try again.");
+    } finally {
+      setIsCreating(false);
+    }
   };
   return (
     <>
@@ -39,11 +35,12 @@ const CreateObject = ({ session }: CreateObjectProps) => {
         onChange={(e) => setObjectName(e.target.value)}
       />
       <button
-        onClick={async () => await createNewObject(objectName)}
-        disabled={!objectName}
+        onClick={createNewObject}
+        disabled={!objectName.trim() || isCreating}
       >
-        Create
+        {isCreating ? "Creating..." : "Create"}
       </button>
+      {error && <p role="alert">{error}</p>}
     </>
   );
 };

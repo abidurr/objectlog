@@ -1,7 +1,8 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-// import { revalidatePath } from "next/cache";
+import { auth0 } from "@/lib/auth0";
+import { revalidatePath } from "next/cache";
 
 // READ actions
 export async function getUsers() {
@@ -26,36 +27,35 @@ type CreateObjectInput = {
 };
 
 export async function createObject({
-  userId,
-  email,
   input = {},
 }: {
-  userId: string;
-  email: string;
   input: CreateObjectInput;
 }) {
   try {
-    // 1) Check if user exists in this app's DB
+    const session = await auth0.getSession();
+    const email = session?.user?.email?.toLowerCase();
+
+    if (!email) {
+      throw new Error("Unauthorized");
+    }
+
     let user = await prisma.user.findUnique({
-      where: { id: userId },
+      where: { email },
     });
 
-    // 2) If not, create a minimal fallback user
     if (!user) {
       user = await prisma.user.create({
         data: {
-          id: userId, // if this is a valid Mongo ObjectId string
-          email: email,
+          email,
           username: email,
-          name: "Imported User",
+          name: session.user.name ?? "Imported User",
         },
       });
     }
 
-    // 3) Create the object
     const object = await prisma.object.create({
       data: {
-        name: input.name ?? "Untitled object",
+        name: input.name?.trim() || "Untitled object",
         userId: user.id,
         fields: input.fields?.length
           ? {
@@ -70,6 +70,7 @@ export async function createObject({
       },
     });
 
+    revalidatePath("/objects");
     return object;
   } catch (error) {
     console.error("createObject error:", error);
