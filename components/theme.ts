@@ -11,4 +11,35 @@ const theme = {
   MOBILE_WIDTH: "1020px",
 };
 
+export const COLOR_OPTIONS = [
+  "ruby",
+  "gray",
+  "gold",
+  "bronze",
+  "brown",
+  "yellow",
+  "amber",
+  "orange",
+  "tomato",
+  "red",
+  "crimson",
+  "pink",
+  "plum",
+  "purple",
+  "violet",
+  "iris",
+  "indigo",
+  "blue",
+  "cyan",
+  "teal",
+  "jade",
+  "green",
+  "grass",
+  "lime",
+  "mint",
+  "sky",
+] as const;
+
+export type COLOR_OPTIONS = (typeof COLOR_OPTIONS)[number] | undefined;
+
 export { theme };

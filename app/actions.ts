@@ -60,7 +60,7 @@ export async function createObject({
         userId: user.id,
         createdAt: new Date(),
         updatedAt: new Date(),
-        color: input?.color || "#000000",
+        color: input?.color || "blue",
         fields: input.fields?.length
           ? {
               create: input.fields.map((field) => ({
@@ -80,6 +80,112 @@ export async function createObject({
     console.error("createObject error:", error);
     throw new Error("Failed to create object");
   }
+}
+
+type UpdateObjectInput = {
+  name?: string;
+  fields?: { name: string }[];
+  color?: string | null;
+};
+
+export async function updateObject({
+  objectId,
+  input = {},
+}: {
+  objectId: string;
+  input: UpdateObjectInput;
+}) {
+  const session = await auth0.getSession();
+  const email = session?.user?.email?.toLowerCase();
+
+  if (!email) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  if (
+    !input.name?.trim() &&
+    input.color === undefined &&
+    input.fields === undefined
+  ) {
+    throw new Error("No updates provided");
+  }
+
+  const object = await prisma.object.update({
+    where: {
+      id: objectId,
+      userId: user.id,
+    },
+    data: {
+      name: input.name?.trim() || undefined,
+      color: input.color,
+      fields:
+        input.fields === undefined
+          ? undefined
+          : {
+              deleteMany: {},
+              create: input.fields.map((field) => ({ name: field.name })),
+            },
+    },
+    include: {
+      fields: true,
+    },
+  });
+
+  revalidatePath("/objects");
+  revalidatePath(`/objects/${objectId}`);
+  return object;
+}
+
+export async function deleteObject(objectId: string) {
+  const session = await auth0.getSession();
+  const email = session?.user?.email?.toLowerCase();
+
+  if (!email) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  await prisma.$transaction(async (transaction) => {
+    const object = await transaction.object.findFirst({
+      where: {
+        id: objectId,
+        userId: user.id,
+      },
+      select: { id: true },
+    });
+
+    if (!object) {
+      throw new Error("Object not found");
+    }
+
+    // await transaction.changeLog.deleteMany({ where: { objectId } });
+    await transaction.record.deleteMany({ where: { objectId } });
+    await transaction.field.deleteMany({ where: { objectId } });
+    await transaction.object.delete({
+      where: {
+        id: objectId,
+        userId: user.id,
+      },
+    });
+  });
+
+  revalidatePath("/objects");
+  revalidatePath(`/objects/${objectId}`);
 }
 
 export async function getObjects(userEmail: string) {

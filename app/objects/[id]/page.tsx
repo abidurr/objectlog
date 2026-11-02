@@ -10,6 +10,7 @@ import {
   StyledButton,
   FieldInfo,
 } from "@/components/";
+import { EditObject } from "@/components/EditObject";
 import Link from "next/link";
 import styled from "styled-components";
 import { theme } from "@/components/theme";
@@ -91,6 +92,12 @@ async function ObjectDetails({ id }: { id: string }) {
           </FieldInfo>
         </FieldsList>
       </ObjectBox>
+      <EditObject
+        objectId={object.id}
+        name={object.name}
+        color={object.color}
+        fields={object.fields}
+      />
       <h1>{object?.name}</h1>
       <dl>
         <dt>ID</dt>
