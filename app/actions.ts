@@ -48,7 +48,7 @@ export async function createObject({
         data: {
           email,
           username: email,
-          name: session.user.name ?? "Imported User",
+          name: session?.user?.name ?? "Imported User",
         },
       });
     }
