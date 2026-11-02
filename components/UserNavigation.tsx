@@ -8,6 +8,14 @@ type UserNavigationProps = {
   session?: Awaited<ReturnType<typeof auth0.getSession>>;
 };
 
+const userNavLinks = [
+  { href: "/fields", label: "Fields" },
+  { href: "/organizations", label: "Organizations" },
+  { href: "/views", label: "Views" },
+  { href: "/profile", label: "Profile" },
+  { href: "/users", label: "Users" },
+];
+
 export async function UserNavigation({
   session: providedSession,
 }: UserNavigationProps = {}) {
@@ -35,21 +43,24 @@ export async function UserNavigation({
             {session.user.name ?? session.user.email}
           </span>
           {session.user.email && session.user.email !== session.user.name && (
-            <span className="user-email">{session.user.email}</span>
+            <span
+              style={{ color: `${theme.PRIMARY_500}`, fontSize: "22px" }}
+              className="user-email"
+            >
+              {session.user.email}
+            </span>
           )}
         </div>
         <span className="chevron" aria-hidden="true" />
       </div>
       <ul className="menu-links">
-        <li>
-          <Link href="/fields">Fields</Link>
-        </li>
-        <li>
-          <Link href="/organizations">Organizations</Link>
-        </li>
-        <li>
-          <Link href="/views">Views</Link>
-        </li>
+        {userNavLinks.map((link) => (
+          <li key={link.href}>
+            <Link style={{ fontSize: "14px" }} href={link.href}>
+              {link.label}
+            </Link>
+          </li>
+        ))}
       </ul>
     </UserNav>
   );

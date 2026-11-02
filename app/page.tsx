@@ -31,12 +31,14 @@ export default function Home() {
           <StyledPara>
             Made with ❤️ by{" "}
             <a
+              style={{ color: `${theme.PRIMARY_500}`, fontWeight: "bold" }}
               href="https://abidur.dev"
               target="_blank"
               rel="noopener noreferrer"
             >
               abidur.dev
-            </a>
+            </a>{" "}
+            in NYC 🗽
           </StyledPara>
         </StyledFooter>
       </StyledMain>

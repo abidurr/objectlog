@@ -1,10 +1,13 @@
-import { Header, Container } from "@/components";
-import Image from "next/image";
+import { Suspense } from "react";
+import { Header, Container, UserNavigation } from "@/components";
 
 export default function Documentation() {
   return (
     <>
       <Header />
+      <Suspense fallback={null}>
+        <UserNavigation />
+      </Suspense>
       <Container>
         <h1>Documentation</h1>
         <ol>

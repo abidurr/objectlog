@@ -13,9 +13,10 @@ const HOVER_TAB_COLOR = `${theme.PRIMARY_500}`;
 const navItems = [
   { href: "/", label: "Home" },
   { href: "/objects", label: "Objects" },
-  // { href: "/fields", label: "Fields" },
-  // { href: "/organizations", label: "Organizations" },
-  // { href: "/views", label: "Views" },
+  { href: "/fields", label: "Fields" },
+  { href: "/organizations", label: "Organizations" },
+  { href: "/views", label: "Views" },
+  { href: "/profile", label: "Profile" },
   { href: "/documentation", label: "Documentation" },
   { href: "/users", label: "Users" },
   { href: "/about", label: "About" },
