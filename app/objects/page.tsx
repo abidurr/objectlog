@@ -54,7 +54,7 @@ async function ObjectsContent() {
         )}
       </UserNav>
       <ObjectsList objects={objects} />
-      <CreateObject session={session} />
+      <CreateObject />
     </>
   );
 }
