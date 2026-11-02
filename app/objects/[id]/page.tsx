@@ -33,7 +33,16 @@ async function ObjectDetails({ id }: { id: string }) {
         <dt>ID</dt>
         <dd>{id}</dd>
         <dt>Name</dt>
+        <dt>ID: {object?.id}</dt>
+        <p>Name: {object?.name}</p>
+        <p>color: {object?.color}</p>
         <dd>{object?.name ?? "Not found"}</dd>
+        <dt>updatedAt</dt>
+        <dd>{new Date(object?.updatedAt).toLocaleDateString()}</dd>
+        <dt>createdAt</dt>
+        <dd>{new Date(object?.createdAt).toLocaleDateString()}</dd>
+        <dt>color</dt>
+        <dd>{object?.color}</dd>
         <dt>Fields</dt>
         <dd>
           {object ? (

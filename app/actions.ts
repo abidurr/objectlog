@@ -24,6 +24,7 @@ export async function getUsers() {
 type CreateObjectInput = {
   name?: string;
   fields?: { name: string }[];
+  color?: string;
 };
 
 export async function createObject({
@@ -57,6 +58,9 @@ export async function createObject({
       data: {
         name: input.name?.trim() || "Untitled object",
         userId: user.id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        color: input?.color || "#000000",
         fields: input.fields?.length
           ? {
               create: input.fields.map((field) => ({

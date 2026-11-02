@@ -26,13 +26,46 @@ model User {
 }
 
 model Object {
-  id     String  @id @default(auto()) @map("_id") @db.ObjectId
-  name   String
-  userId String  @db.ObjectId
-  user   User    @relation(fields: [userId], references: [id])
-  fields Field[]
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  createdAt  DateTime?   @default(now())
+  updatedAt  DateTime?   @updatedAt
+  color      String?
+  userId     String      @db.ObjectId
+  user       User        @relation(fields: [userId], references: [id])
+  fields     Field[]
+  records    Record[]
+  changeLogs ChangeLog[]
 
   @@map("objects")
+}
+
+model Record {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  fields      Json?
+  createdAt   DateTime?   @default(now())
+  updatedAt   DateTime?   @updatedAt
+  objectId    String      @db.ObjectId
+  object      Object      @relation(fields: [objectId], references: [id])
+  changeLogs  ChangeLog[]
+
+  @@map("records")
+}
+
+model ChangeLog {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  objectId  String    @db.ObjectId
+  object    Object    @relation(fields: [objectId], references: [id])
+  recordId  String    @db.ObjectId
+  record    Record    @relation(fields: [recordId], references: [id])
+  fieldName String
+  oldValue  String?
+  newValue  String?
+  createdAt DateTime? @default(now())
+
+  @@map("change_logs")
 }
 
 model Organization {
