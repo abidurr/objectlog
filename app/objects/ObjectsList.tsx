@@ -6,7 +6,15 @@ import { useState } from "react";
 import Link from "next/link";
 import styled from "styled-components";
 import { theme } from "@/components/theme";
-import { LetterIcon, ObjectBox, IconAndTitle } from "@/components/StyledBits";
+import {
+  LetterIcon,
+  ObjectBox,
+  IconAndTitle,
+  ObjectsGrid,
+  FieldInfo,
+} from "@/components/StyledBits";
+import { FiBookmark, FiClock } from "react-icons/fi";
+import { IoBrushOutline } from "react-icons/io5";
 
 const ObjectsList = ({
   objects,
@@ -27,39 +35,45 @@ const ObjectsList = ({
   return (
     <StyledObjects>
       <p>These are the objects you made:</p>
-      {objects?.map((object) => (
-        <div key={object.id}>
-          <Link href={`/objects/${object?.id}`}>
-            <ObjectBox>
-              <IconAndTitle>
-                <LetterIcon color={object?.color ?? undefined}>
-                  {object?.name?.charAt(0).toUpperCase()}
-                </LetterIcon>
-                <h3>{object?.name}</h3>
-              </IconAndTitle>
-              {/* <p>{JSON.stringify(object)}</p> */}
-              <FieldsList>
-                <p>
-                  <FieldLabelSpan>id</FieldLabelSpan>
-                  <FieldLabelSpan>{object?.id}</FieldLabelSpan>
-                </p>
-                <p>
-                  <FieldLabelSpan>color</FieldLabelSpan>
-                  {object?.color}
-                </p>
-                <p>
-                  <FieldLabelSpan>updated</FieldLabelSpan>
-                  {object.updatedAt?.toLocaleString() ?? "Not available"}
-                </p>
-                <p>
-                  <FieldLabelSpan>created</FieldLabelSpan>
-                  {object.createdAt?.toLocaleString() ?? "Not available"}
-                </p>
-              </FieldsList>
-            </ObjectBox>
-          </Link>
-        </div>
-      ))}
+      <ObjectsGrid>
+        {objects?.map((object) => (
+          <div key={object.id}>
+            <Link href={`/objects/${object?.id}`}>
+              <ObjectBox>
+                <IconAndTitle>
+                  <LetterIcon color={object?.color ?? undefined}>
+                    {object?.name?.charAt(0).toUpperCase()}
+                  </LetterIcon>
+                  <h3>{object?.name}</h3>
+                </IconAndTitle>
+                {/* <p>{JSON.stringify(object)}</p> */}
+                <FieldsList>
+                  <FieldInfo>
+                    <FiBookmark />
+                    <FieldLabelSpan>id</FieldLabelSpan>
+                    <FieldLabelSpan>{object?.id}</FieldLabelSpan>
+                  </FieldInfo>
+                  <FieldInfo>
+                    <IoBrushOutline />
+                    <FieldLabelSpan>color</FieldLabelSpan>
+                    {object?.color ?? "Not available"}
+                  </FieldInfo>
+                  <FieldInfo>
+                    <FiClock />
+                    <FieldLabelSpan>updated</FieldLabelSpan>
+                    {object.updatedAt?.toLocaleString() ?? "Not available"}
+                  </FieldInfo>
+                  <FieldInfo>
+                    <FiClock />
+                    <FieldLabelSpan>created</FieldLabelSpan>
+                    {object.createdAt?.toLocaleString() ?? "Not available"}
+                  </FieldInfo>
+                </FieldsList>
+              </ObjectBox>
+            </Link>
+          </div>
+        ))}
+      </ObjectsGrid>
     </StyledObjects>
   );
 };

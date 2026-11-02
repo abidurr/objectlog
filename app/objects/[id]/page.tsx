@@ -7,10 +7,14 @@ import {
   LetterIcon,
   ObjectBox,
   IconAndTitle,
+  StyledButton,
+  FieldInfo,
 } from "@/components/";
 import Link from "next/link";
 import styled from "styled-components";
 import { theme } from "@/components/theme";
+import { FiArrowLeft, FiBookmark, FiClock } from "react-icons/fi";
+import { IoBrushOutline } from "react-icons/io5";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   return (
@@ -22,7 +26,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         <UserNavigation />
       </Suspense>
       <Container>
-        <h1>Object details</h1>
+        {/* <h1>Object details</h1> */}
         <Suspense fallback={<p>Loading object...</p>}>
           {params.then(({ id }) => (
             <ObjectDetails id={id} />
@@ -38,10 +42,11 @@ async function ObjectDetails({ id }: { id: string }) {
 
   return (
     <>
-      <Link href="/objects">
-        <button style={{ marginLeft: "8px", padding: "4px 8px" }}>
+      <Link style={{ textDecoration: "none" }} href="/objects">
+        <StyledButton>
+          <FiArrowLeft />
           Back to Objects
-        </button>
+        </StyledButton>
       </Link>
       <ObjectBox>
         <IconAndTitle>
@@ -51,22 +56,26 @@ async function ObjectDetails({ id }: { id: string }) {
           <h3>{object?.name}</h3>
         </IconAndTitle>
         <FieldsList>
-          <p>
+          <FieldInfo>
+            <FiBookmark />
             <FieldLabelSpan>id</FieldLabelSpan>
             <FieldLabelSpan>{object?.id}</FieldLabelSpan>
-          </p>
-          <p>
+          </FieldInfo>
+          <FieldInfo>
+            <IoBrushOutline />
             <FieldLabelSpan>color</FieldLabelSpan>
-            {object?.color}
-          </p>
-          <p>
+            {object?.color ?? "Not available"}
+          </FieldInfo>
+          <FieldInfo>
+            <FiClock />
             <FieldLabelSpan>updated</FieldLabelSpan>
             {object.updatedAt?.toLocaleString() ?? "Not available"}
-          </p>
-          <p>
+          </FieldInfo>
+          <FieldInfo>
+            <FiClock />
             <FieldLabelSpan>created</FieldLabelSpan>
             {object.createdAt?.toLocaleString() ?? "Not available"}
-          </p>
+          </FieldInfo>
         </FieldsList>
       </ObjectBox>
       <h1>{object?.name}</h1>
@@ -83,7 +92,7 @@ async function ObjectDetails({ id }: { id: string }) {
         <dt>createdAt</dt>
         <dd>{object?.createdAt?.toLocaleDateString() ?? "Not available"}</dd>
         <dt>color</dt>
-        <dd>{object?.color}</dd>
+        <dd>{object?.color ?? "Not available"}</dd>
         <dt>Fields</dt>
         <dd>
           {object ? (
