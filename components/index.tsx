@@ -6,4 +6,4 @@ export * from "./LoggedInUser";
 export * from "./UserNavigation";
 export * from "./theme";
 export * from "./CreateObject";
-export * from "./LetterIcon";
+export * from "./StyledBits";

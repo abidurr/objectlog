@@ -1,6 +1,13 @@
 import { Suspense } from "react";
 import { getObject } from "@/app/actions";
-import { Container, Header, UserNavigation } from "@/components/";
+import {
+  Container,
+  Header,
+  UserNavigation,
+  LetterIcon,
+  ObjectBox,
+  IconAndTitle,
+} from "@/components/";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   return (
@@ -27,7 +34,13 @@ async function ObjectDetails({ id }: { id: string }) {
   const object = await getObject(id);
 
   return (
-    <>
+    <ObjectBox>
+      <IconAndTitle>
+        <LetterIcon color={object?.color}>
+          {object?.name?.charAt(0).toUpperCase()}
+        </LetterIcon>
+        <h3>{object?.name}</h3>
+      </IconAndTitle>
       <h1>{object?.name}</h1>
       <dl>
         <dt>ID</dt>
@@ -60,6 +73,6 @@ async function ObjectDetails({ id }: { id: string }) {
           )}
         </dd>
       </dl>
-    </>
+    </ObjectBox>
   );
 }

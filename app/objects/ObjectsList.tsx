@@ -6,7 +6,7 @@ import { useState } from "react";
 import Link from "next/link";
 import styled from "styled-components";
 import { theme } from "@/components/theme";
-import { LetterIcon } from "@/components/LetterIcon";
+import { LetterIcon, ObjectBox, IconAndTitle } from "@/components/";
 
 const ObjectsList = ({
   objects,
@@ -30,9 +30,11 @@ const ObjectsList = ({
       {objects?.map((object) => (
         <div key={object.id}>
           <Link href={`/objects/${object?.id}`}>
-            <ObjectBox color={object?.color}>
+            <ObjectBox>
               <IconAndTitle>
-                <LetterIcon>{object?.name?.charAt(0).toUpperCase()}</LetterIcon>
+                <LetterIcon color={object?.color}>
+                  {object?.name?.charAt(0).toUpperCase()}
+                </LetterIcon>
                 <h3>{object?.name}</h3>
               </IconAndTitle>
               {/* <p>{JSON.stringify(object)}</p> */}
@@ -52,22 +54,6 @@ const ObjectsList = ({
     </StyledObjects>
   );
 };
-
-const IconAndTitle = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-`;
-
-const ObjectBox = styled.div<{ color?: string }>`
-  border: 1px solid #ccc;
-  padding: 24px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  background-color: ${(p) => p.color || theme.PRIMARY_400};
-  color: ${theme.BLACK_TEXT_COLOR};
-  min-width: 300px;
-`;
 
 const StyledObjects = styled.div`
   a {
