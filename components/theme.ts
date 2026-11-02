@@ -8,6 +8,7 @@ const theme = {
   PRIMARY_800: "#abc4ff",
   BLACK_TEXT_COLOR: "#000066",
   BACKGROUND_COLOR: "#001852",
+  MOBILE_WIDTH: "1020px",
 };
 
 export { theme };
