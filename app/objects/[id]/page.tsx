@@ -40,6 +40,19 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 async function ObjectDetails({ id }: { id: string }) {
   const object = await getObject(id);
 
+  if (!object) {
+    return (
+      <>
+        <Link style={{ textDecoration: "none" }} href="/objects">
+          <StyledButton>
+            <FiArrowLeft />
+            Back to Objects
+          </StyledButton>
+        </Link>
+        <p>Object not found</p>
+      </>
+    );
+  }
   return (
     <>
       <Link style={{ textDecoration: "none" }} href="/objects">
@@ -69,12 +82,12 @@ async function ObjectDetails({ id }: { id: string }) {
           <FieldInfo>
             <FiClock />
             <FieldLabelSpan>updated</FieldLabelSpan>
-            {object.updatedAt?.toLocaleString() ?? "Not available"}
+            {object?.updatedAt?.toLocaleString() ?? "Not available"}
           </FieldInfo>
           <FieldInfo>
             <FiClock />
             <FieldLabelSpan>created</FieldLabelSpan>
-            {object.createdAt?.toLocaleString() ?? "Not available"}
+            {object?.createdAt?.toLocaleString() ?? "Not available"}
           </FieldInfo>
         </FieldsList>
       </ObjectBox>
