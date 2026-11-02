@@ -15,7 +15,7 @@ export const ObjectBox = styled.div<{ color?: string }>`
   border: 1px solid #ccc;
   padding: 24px;
   margin-bottom: 10px;
-  border-radius: 5px;
+  border-radius: 12px;
   background-color: ${(p) => (!!p.color ? p.color : theme.PRIMARY_400)};
   color: ${theme.BLACK_TEXT_COLOR};
   min-width: 300px;
