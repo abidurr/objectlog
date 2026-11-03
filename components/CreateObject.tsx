@@ -24,6 +24,7 @@ const CreateObject = () => {
 
   const createNewObject = async () => {
     const name = objectName.trim();
+    const color = objectColor?.toLowerCase().trim();
     if (!name || isCreating) {
       return;
     }
@@ -31,7 +32,7 @@ const CreateObject = () => {
     setIsCreating(true);
     setError("");
     try {
-      await createObject({ input: { name, fields: [] } });
+      await createObject({ input: { name, fields: [], color: color } });
       setObjectName("");
     } catch {
       setError("Could not create object. Please try again.");
