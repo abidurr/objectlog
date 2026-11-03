@@ -91,7 +91,12 @@ export const StyledButton = styled.button<{
         return theme.TRANSLUCENT.BLUE1;
     }
   }};
-  color: ${theme.BLACK_TEXT_COLOR};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: bottom:
+  height: 36px;
+  color: rgba(0,0,0, 0.8)
   border: none;
   padding: 16px;
   border-radius: 8px;
@@ -100,9 +105,11 @@ export const StyledButton = styled.button<{
   display: flex;
   align-items: center;
   gap: 8px;
-  text-decoration: none;
+  /* text-decoration: none; */
   margin-bottom: 16px;
   font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
   box-shadow: ${theme.BOX_SHADOW.ELEVATION_3};
   &:hover {
     text-decoration: none;
@@ -170,6 +177,9 @@ export const ObjectsGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
+  @media (max-width: ${theme.MOBILE_WIDTH}) {
+    grid-template-columns: 1fr;
+  }
 `;
 export const FieldInfo = styled.div`
   display: flex;
