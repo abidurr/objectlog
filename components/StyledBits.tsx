@@ -31,9 +31,9 @@ export const LetterIcon = styled.div<{ color?: string }>`
   min-width: 48px;
   min-height: 48px;
   border-radius: 50%;
-  color: ${(p) => p.color || theme.BLACK_TEXT_COLOR};
-  background-color: ${theme.PRIMARY_300};
-  opacity: 0.3;
+  color: ${theme.BLACK_TEXT_COLOR};
+  background-color: ${(p) => p.color || theme.PRIMARY_300};
+  opacity: 0.4;
   /* color: rgba(0, 0, 0, 0.4); */
   display: flex;
   align-items: center;

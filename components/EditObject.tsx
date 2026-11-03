@@ -133,9 +133,10 @@ const EditObject = ({ objectId, name, color, fields }: EditObjectProps) => {
             </FieldInfo>
             {/* <label htmlFor={`object-color-${objectId}`}>Color</label> */}
             <StyledSelect
+              style={{ backgroundColor: objectColor?.toLowerCase() || "white" }}
               id={`object-color-${objectId}`}
               value={objectColor}
-              onChange={(event) => setObjectColor(event.target.value)}
+              onChange={(event) => setObjectColor(event?.target?.value)}
             >
               <option value="">No color</option>
               {objectColor && !colorOptions.includes(objectColor) && (
