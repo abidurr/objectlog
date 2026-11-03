@@ -93,6 +93,7 @@ const theme = {
     ELEVATION_4: "3.2px 6.4px 6.4px hsl(0deg 0% 0% / 0.40)",
     ELEVATION_5: "4.0px 8.0px 8.0px hsl(0deg 0% 0% / 0.38)",
     ELEVATION_8: "6.5px 13.0px 13.0px hsl(0deg 0% 0% / 0.30)",
+    ELEVATION_NAV: "8.0px 16.0px 16.0px hsl(0deg 0% 0% / 0.25)",
   },
 } as const satisfies Theme;
 

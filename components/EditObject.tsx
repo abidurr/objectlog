@@ -210,7 +210,7 @@ const EditObject = ({ objectId, name, color, fields }: EditObjectProps) => {
         </fieldset> */}
         <div style={{ display: "flex", gap: "16px", marginTop: "16px" }}>
           <StyledButton
-            buttonColor="green"
+            btnclr="green"
             // style={{ backgroundColor: "rgba(76, 175, 80, 0.4)" }}
             type="submit"
             disabled={isSaving || isDeleting}
@@ -218,7 +218,7 @@ const EditObject = ({ objectId, name, color, fields }: EditObjectProps) => {
             {isSaving ? "Saving..." : "Save Changes"}
           </StyledButton>
           <StyledButton
-            buttonColor="red"
+            btnclr="red"
             // style={{ backgroundColor: "rgba(244, 67, 54, 0.4)" }}
             type="button"
             onClick={removeObject}

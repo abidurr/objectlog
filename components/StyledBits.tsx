@@ -73,10 +73,10 @@ export const LetterIcon = styled.div<{ bgcolor?: string; color?: string }>`
 `;
 
 export const StyledButton = styled.button<{
-  buttonColor?: "red" | "blue" | "green" | "yellow" | "orange";
+  btnclr?: "red" | "blue" | "green" | "yellow" | "orange";
 }>`
   background-color: ${(p) => {
-    switch (p.buttonColor) {
+    switch (p.btnclr) {
       case "red":
         return theme.TRANSLUCENT.RED1;
       case "blue":
@@ -107,7 +107,7 @@ export const StyledButton = styled.button<{
   &:hover {
     text-decoration: none;
     background-color: ${(p) => {
-      switch (p.buttonColor) {
+      switch (p.btnclr) {
         case "red":
           return theme.TRANSLUCENT.RED2;
         case "blue":

@@ -3,7 +3,7 @@
 import { styled } from "styled-components";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { theme } from "./theme";
 
 const ACTIVE_TAB_COLOR = `${theme.PRIMARY_300}`;
@@ -22,15 +22,29 @@ const navItems = [
   // { href: "/users", label: "Users" },
 ];
 
-const StyledNav = styled.nav<{ $isOpen: boolean }>`
+const StyledNav = styled.nav<{ $isOpen: boolean; $isScrolled: boolean }>`
   width: fit-content;
   position: sticky;
-  /* box-shadow: 2px 2px 5px rgba(200, 200, 200, 0.7); */
   z-index: 3;
-  top: 24px;
+  top: ${({ $isScrolled }) => ($isScrolled ? "16px" : "32px")};
   font-size: 1em;
-  border-radius: 4px;
+  border-radius: 8px;
   margin: 0px auto;
+  background-color: ${({ $isScrolled }) =>
+    $isScrolled ? "rgba(237, 242, 251, 0.5)" : "rgba(237, 242, 251, 0.2)"};
+  box-shadow: ${({ $isScrolled }) =>
+    $isScrolled ? theme.BOX_SHADOW.ELEVATION_8 : theme.BOX_SHADOW.ELEVATION_2};
+  backdrop-filter: ${({ $isScrolled }) =>
+    $isScrolled ? "blur(12px)" : "none"};
+  transition:
+    top 220ms ease-out,
+    background-color 180ms ease-out,
+    box-shadow 180ms ease-out,
+    backdrop-filter 180ms ease-out;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
 
   .menu-toggle {
     display: none;
@@ -89,13 +103,14 @@ const StyledNav = styled.nav<{ $isOpen: boolean }>`
 
   @media (max-width: ${theme.MOBILE_WIDTH}) {
     width: min(calc(100% - 24px), 360px);
-    top: 12px;
+    top: ${({ $isScrolled }) => ($isScrolled ? "16px" : "32px")};
 
     .mobile-header {
       display: flex;
       min-height: 44px;
       align-items: center;
       justify-content: space-between;
+      padding: 4px 16px;
     }
 
     .mobile-brand {
@@ -194,9 +209,18 @@ const StyledNav = styled.nav<{ $isOpen: boolean }>`
 export const Header = () => {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const updateScrollState = () => setIsScrolled(window.scrollY > 24);
+
+    updateScrollState();
+    window.addEventListener("scroll", updateScrollState, { passive: true });
+    return () => window.removeEventListener("scroll", updateScrollState);
+  }, []);
 
   return (
-    <StyledNav $isOpen={isOpen}>
+    <StyledNav $isOpen={isOpen} $isScrolled={isScrolled}>
       <div className="mobile-header">
         <Link
           className="mobile-brand"
@@ -205,7 +229,7 @@ export const Header = () => {
         >
           <p
             style={{
-              color: theme.PRIMARY_700,
+              color: isScrolled ? theme.BLACK_TEXT_COLOR : theme.PRIMARY_700,
               fontWeight: "normal",
               letterSpacing: "0.5px",
               fontSize: "18px",

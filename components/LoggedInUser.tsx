@@ -91,7 +91,7 @@ const LoggedInUser = async () => {
 
       <FlexDiv style={{ marginTop: "24px", marginBottom: "16px" }}>
         <Link style={{ textDecoration: "none" }} href="/auth/logout">
-          <StyledButton buttonColor="red">Logout</StyledButton>
+          <StyledButton btnclr="orange">Logout</StyledButton>
         </Link>
       </FlexDiv>
     </>
