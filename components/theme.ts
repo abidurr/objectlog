@@ -51,6 +51,7 @@ export type Theme = {
     ELEVATION_4: string;
     ELEVATION_5: string;
     ELEVATION_8: string;
+    ELEVATION_NAV: string;
   };
 };
 
