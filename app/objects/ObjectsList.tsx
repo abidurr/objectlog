@@ -36,7 +36,12 @@ const ObjectsList = ({
 
   return (
     <StyledObjects>
-      <p>These are the objects you made:</p>
+      <h1>My Objects</h1>
+      <p>
+        Below are the objects you made. You can click into one to update its
+        fields and add records for the object.
+      </p>
+      &nbsp;
       <ObjectsGrid>
         {objects?.map((object) => (
           <div key={object.id}>

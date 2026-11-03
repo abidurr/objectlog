@@ -36,7 +36,7 @@ export default async function Objects() {
     <>
       <Header />
       <Container>
-        <h1>Objects</h1>
+        {/*<h1>Objects</h1>*/}
         <Suspense fallback={<p>Loading user objects...</p>}>
           <ObjectsContent />
         </Suspense>

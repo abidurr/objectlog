@@ -26,7 +26,9 @@ export default function Home() {
           you want. Then add all the items you want to remember. It really can
           be as simple as that.
         </StyledPara>
-        <StyledPara>Work in progress 🚧</StyledPara>
+        <h3>
+          🚧 Work in progress 🚧
+        </h3>
         <StyledFooter>
           <StyledPara>
             Made with ❤️ by{" "}
