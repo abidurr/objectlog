@@ -1,13 +1,16 @@
-import React from "react";
+import { Suspense } from "react";
 import Link from "next/link";
 import { styled } from "styled-components";
-import { Header, Container } from "@/components/index";
+import { Header, Container, UserNavigation } from "@/components/index";
 import { theme } from "../components/theme";
 
 export default function Home() {
   return (
     <StyledPage>
       <Header />
+      <Suspense fallback={null}>
+        <UserNavigation />
+      </Suspense>
       <StyledMain>
         <h1>ObjectLog</h1>
         <h3>Objects & Logs.</h3>
@@ -24,9 +27,7 @@ export default function Home() {
           you want. Then add all the items you want to remember. It really can
           be as simple as that.
         </StyledPara>
-        <h3>
-          🚧 Work in progress 🚧
-        </h3>
+        <h3>🚧 Work in progress 🚧</h3>
         <StyledFooter>
           <StyledPara>
             Made with ❤️ by{" "}

@@ -1,11 +1,14 @@
-import { Header, Container } from "@/components";
-import Image from "next/image";
+import { Suspense } from "react";
+import { Header, Container, UserNavigation } from "@/components";
 import { theme } from "@/components/theme";
 
 export default function Motivation() {
   return (
     <>
       <Header />
+      <Suspense fallback={null}>
+        <UserNavigation />
+      </Suspense>
       <Container>
         <h1>About</h1>
         <p>
