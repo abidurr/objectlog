@@ -1,8 +1,21 @@
 "use client";
 import { useAtom } from "jotai";
 import { isLoggedInAtom, loggedInUserAtom } from "@/components/atoms";
+import { StyledButton } from "./StyledBits";
+import Link from "next/link";
 
 const Login = () => {
+  return (
+    <div>
+      <h1>Not logged in</h1>
+      <Link style={{ textDecoration: "none" }} href="/auth/login">
+        <StyledButton>Log in or sign up</StyledButton>
+      </Link>
+    </div>
+  );
+};
+
+const LoginOld = () => {
   const [isLoggedIn, setIsLoggedIn] = useAtom(isLoggedInAtom);
   const [loggedInUser, setLoggedInUser] = useAtom(loggedInUserAtom);
 
