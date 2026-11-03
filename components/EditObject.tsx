@@ -13,7 +13,7 @@ import {
   FieldInfo,
   FieldLabelSpan,
 } from "@/components/StyledBits";
-import { FiEye } from "react-icons/fi";
+import { FiEye, FiTrash2, FiEdit } from "react-icons/fi";
 import { IoBrushOutline } from "react-icons/io5";
 
 type EditObjectProps = {
@@ -33,6 +33,7 @@ const EditObject = ({ objectId, name, color, fields }: EditObjectProps) => {
   );
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [areYouSure, setAreYouSure] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -95,8 +96,8 @@ const EditObject = ({ objectId, name, color, fields }: EditObjectProps) => {
   return (
     <ObjectBox>
       <form onSubmit={saveObject}>
-        <h2>Edit object</h2>
-        <div></div>
+        {/* <h2>Edit object</h2> */}
+        {/* <div></div> */}
         <div>
           <FieldsList>
             {/* <FieldInfo>
@@ -208,24 +209,58 @@ const EditObject = ({ objectId, name, color, fields }: EditObjectProps) => {
             Add field
           </StyledButton>
         </fieldset> */}
-        <div style={{ display: "flex", gap: "16px", marginTop: "16px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "16px",
+            marginTop: "16px",
+          }}
+        >
           <StyledButton
             btnclr="green"
-            // style={{ backgroundColor: "rgba(76, 175, 80, 0.4)" }}
             type="submit"
             disabled={isSaving || isDeleting}
           >
-            {isSaving ? "Saving..." : "Save Changes"}
+            <FiEdit />
+            {isSaving ? "Saving..." : "Edit Object"}
           </StyledButton>
-          <StyledButton
-            btnclr="red"
-            // style={{ backgroundColor: "rgba(244, 67, 54, 0.4)" }}
-            type="button"
-            onClick={removeObject}
-            disabled={isSaving || isDeleting}
-          >
-            {isDeleting ? "Deleting..." : "Delete"}
-          </StyledButton>
+          {!areYouSure && (
+            <StyledButton
+              btnclr="red"
+              type="button"
+              onClick={() => setAreYouSure(true)}
+              disabled={isSaving || isDeleting || areYouSure}
+            >
+              <FiTrash2 />
+              {isDeleting ? "Deleting..." : `Delete Object`}
+            </StyledButton>
+          )}
+
+          {areYouSure && (
+            <>
+              <p style={{ maxWidth: "200px" }}>
+                Are you sure you want to delete your object {name}? This will
+                also delete all your records, fields, and logs.
+              </p>
+              <StyledButton
+                onClick={() => setAreYouSure(false)}
+                btnclr="green"
+                disabled={isSaving || isDeleting}
+              >
+                No, go back
+              </StyledButton>
+              <StyledButton
+                btnclr="red"
+                type="button"
+                onClick={removeObject}
+                disabled={isSaving || isDeleting}
+              >
+                <FiTrash2 />
+                {isDeleting ? "Deleting..." : `Yes, delete ${name}`}
+              </StyledButton>
+            </>
+          )}
         </div>
         {message && <p role="status">{message}</p>}
         {error && <p role="alert">{error}</p>}
