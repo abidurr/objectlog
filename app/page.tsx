@@ -1,9 +1,7 @@
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { styled } from "styled-components";
-import { Suspense } from "react";
-import { Header, Container, Login } from "@/components/index";
+import { Header, Container } from "@/components/index";
 import { theme } from "../components/theme";
 
 export default function Home() {
