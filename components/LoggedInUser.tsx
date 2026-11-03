@@ -12,11 +12,16 @@ const LoggedInUser = async () => {
   if (!session) {
     return (
       <>
-        {/* Redirects to Auth0 to sign up */}
-        <a href="/auth/login?screen_hint=signup">Signup</a>
-        <br />
-        {/* Redirects to Auth0 to log in */}
-        <a href="/auth/login">Login</a>
+        <h1>Not logged in</h1>
+        <Link style={{ textDecoration: "none" }} href="/auth/login">
+          <StyledButton>Log in or sign up</StyledButton>
+        </Link>
+        {/*<Link
+          style={{ textDecoration: "none" }}
+          href="/auth/login?screen_hint=signup"
+        >
+          <StyledButton>Sign up</StyledButton>
+        </Link>*/}
       </>
     );
   }
