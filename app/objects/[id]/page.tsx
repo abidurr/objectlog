@@ -19,6 +19,7 @@ import { FiArrowLeft, FiBookmark, FiClock } from "react-icons/fi";
 import { IoBrushOutline } from "react-icons/io5";
 import { ColorPill } from "@/components/StyledBits";
 import { getBackgroundForColor } from "@/components/theme";
+import moment from "moment-timezone";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   return (
@@ -95,12 +96,17 @@ async function ObjectDetails({ id }: { id: string }) {
             <FieldInfo>
               <FiClock />
               <FieldLabelSpan>updated</FieldLabelSpan>
-              {object?.updatedAt?.toLocaleString() ?? "Not available"}
+              {object?.updatedAt
+                ? moment(object?.updatedAt).format("llll")
+                : "Not available"}
             </FieldInfo>
             <FieldInfo>
               <FiClock />
               <FieldLabelSpan>created</FieldLabelSpan>
-              {object?.createdAt?.toLocaleString() ?? "Not available"}
+
+              {object?.createdAt
+                ? moment(object?.createdAt).format("llll")
+                : "Not available"}
             </FieldInfo>
           </FieldsList>
         </ObjectBox>
