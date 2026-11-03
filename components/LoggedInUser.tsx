@@ -3,6 +3,8 @@ import styled from "styled-components";
 import Image from "next/image";
 import { ObjectBox, StyledButton } from "@/components/StyledBits";
 import Link from "next/link";
+import moment from "moment-timezone";
+import { theme } from "@/components/theme";
 
 const LoggedInUser = async () => {
   const session = await auth0.getSession();
@@ -29,7 +31,8 @@ const LoggedInUser = async () => {
 
   return (
     <>
-      <p>Logged in as {session.user.email}</p>
+      <h1>My Account</h1>
+      {/* <p>Logged in as {session.user.email}</p> */}
       {/* <pre>{JSON.stringify(session, null, 2)}</pre> */}
       <ObjectBox>
         <FlexDiv>
@@ -47,35 +50,43 @@ const LoggedInUser = async () => {
           )}
         </FlexDiv>
         <FlexDiv>
-          <h3>Nickname</h3>
+          <h3 style={{ fontFamily: "monospace" }}>Nickname</h3>
           <p>{session.user.nickname}</p>
         </FlexDiv>
         <FlexDiv>
-          <h3>Name</h3>
+          <h3 style={{ fontFamily: "monospace" }}>Name</h3>
           <p>{session.user.name}</p>
         </FlexDiv>
         <FlexDiv>
-          <h3>Email</h3>
+          <h3 style={{ fontFamily: "monospace" }}>Email</h3>
           <p>{session.user.email}</p>
         </FlexDiv>
         <FlexDiv>
-          <h3>Verified</h3>
+          <h3 style={{ fontFamily: "monospace" }}>Created</h3>
+          <p>{moment.unix(session?.internal?.createdAt).format("LLL")}</p>
+        </FlexDiv>
+        <FlexDiv>
+          <h3 style={{ fontFamily: "monospace" }}>Verified</h3>
           <p>{session.user.email_verified ? "Yes" : "No"}</p>
         </FlexDiv>
         <FlexDiv>
-          <h3>Sub</h3>
+          <h3 style={{ fontFamily: "monospace" }}>Sub</h3>
           <p>{session.user.sub}</p>
         </FlexDiv>
         <FlexDiv>
-          <h3>Token expires at</h3>
-          <p>{new Date(session.user.exp).toLocaleString()}</p>
+          <h3 style={{ fontFamily: "monospace" }}>SID</h3>
+          <p>{session?.internal?.sid}</p>
+        </FlexDiv>
+        <FlexDiv>
+          <h3 style={{ fontFamily: "monospace" }}>Expires</h3>
+          <p>{moment.unix(session?.tokenSet?.expiresAt).format("LLL")}</p>
         </FlexDiv>
       </ObjectBox>
       {/* <h3>Picture</h3> */}
 
-      <FlexDiv>
+      <FlexDiv style={{ marginTop: "24px", marginBottom: "16px" }}>
         <Link style={{ textDecoration: "none" }} href="/auth/logout">
-          <StyledButton>Logout</StyledButton>
+          <StyledButton buttonColor="red">Logout</StyledButton>
         </Link>
       </FlexDiv>
     </>
@@ -89,6 +100,8 @@ const FlexDiv = styled.div`
     margin: 4px 8px 4px 0;
     font-size: 16px;
     font-weight: bold;
+    /* color: ${theme.PRIMARY_600}; */
+    opacity: 0.3;
   }
   p {
     margin: 4px 8px 4px 0;

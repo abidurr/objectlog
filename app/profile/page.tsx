@@ -10,7 +10,7 @@ export default function Profile() {
         <UserNavigation />
       </Suspense>
       <Container>
-        <h1>Profile</h1>
+        {/* <h1>Profile</h1> */}
         <Suspense fallback={<div>Loading user...</div>}>
           <LoggedInUser />
         </Suspense>
