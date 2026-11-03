@@ -9,11 +9,15 @@ type UserNavigationProps = {
 };
 
 const userNavLinks = [
+  { href: "/", label: "Home" },
+  { href: "/objects", label: "Objects" },
   { href: "/fields", label: "Fields" },
-  { href: "/organizations", label: "Organizations" },
   { href: "/views", label: "Views" },
-  { href: "/profile", label: "Profile" },
+  { href: "/organizations", label: "Organizations" },
   { href: "/users", label: "Users" },
+  { href: "/about", label: "About" },
+  { href: "/documentation", label: "Documentation" },
+  { href: "/profile", label: "My Account" },
 ];
 
 export async function UserNavigation({
@@ -61,6 +65,14 @@ export async function UserNavigation({
             </Link>
           </li>
         ))}
+        <li key={"log-out"}>
+          <Link
+            style={{ fontSize: "14px", color: "red" }}
+            href={"/auth/logout"}
+          >
+            Log Out
+          </Link>
+        </li>
       </ul>
     </UserNav>
   );
@@ -193,7 +205,7 @@ const UserNav = styled.nav`
 
   &:hover .menu-links,
   &:focus-within .menu-links {
-    max-height: 180px;
+    max-height: fit-content;
     padding: 8px;
     border-color: rgba(0, 0, 102, 0.2);
     opacity: 1;
@@ -207,7 +219,9 @@ const UserNav = styled.nav`
     padding: 11px 12px;
     border-radius: 9px;
     color: ${theme.BLACK_TEXT_COLOR};
-    font-size: 14px;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
     text-decoration: none;
     text-align: center;
     box-sizing: border-box;
@@ -235,7 +249,7 @@ const UserNav = styled.nav`
 
   @media (hover: none) {
     .menu-links {
-      max-height: 180px;
+      max-height: fit-content;
       padding: 8px;
       border-color: rgba(0, 0, 102, 0.2);
       opacity: 1;
