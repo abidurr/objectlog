@@ -47,14 +47,30 @@ export const LetterIcon = styled.div<{ color?: string }>`
 
   h3 {
     font-size: 24px;
-
     color: ${(p) => p.color || theme.BLACK_TEXT_COLOR};
     opacity: 1;
   }
 `;
 
-export const StyledButton = styled.button`
-  background-color: ${theme.PRIMARY_600};
+export const StyledButton = styled.button<{
+  buttonColor?: "red" | "blue" | "green" | "yellow" | "orange";
+}>`
+  background-color: ${(p) => {
+    switch (p.buttonColor) {
+      case "red":
+        return theme.TRANSLUCENT.RED1;
+      case "blue":
+        return theme.TRANSLUCENT.BLUE1;
+      case "green":
+        return theme.TRANSLUCENT.GREEN1;
+      case "yellow":
+        return theme.TRANSLUCENT.YELLOW1;
+      case "orange":
+        return theme.TRANSLUCENT.ORANGE1;
+      default:
+        return theme.TRANSLUCENT.BLUE1;
+    }
+  }};
   color: ${theme.BLACK_TEXT_COLOR};
   border: none;
   padding: 16px;
@@ -67,10 +83,25 @@ export const StyledButton = styled.button`
   text-decoration: none;
   margin-bottom: 16px;
   font-size: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: ${theme.BOX_SHADOW.ELEVATION_5};
   &:hover {
     text-decoration: none;
-    background-color: ${theme.PRIMARY_800};
+    background-color: ${(p) => {
+      switch (p.buttonColor) {
+        case "red":
+          return theme.TRANSLUCENT.RED2;
+        case "blue":
+          return theme.TRANSLUCENT.BLUE2;
+        case "green":
+          return theme.TRANSLUCENT.GREEN2;
+        case "yellow":
+          return theme.TRANSLUCENT.YELLOW2;
+        case "orange":
+          return theme.TRANSLUCENT.ORANGE2;
+        default:
+          return theme.TRANSLUCENT.BLUE2;
+      }
+    }};
   }
 `;
 
