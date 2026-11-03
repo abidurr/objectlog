@@ -5,7 +5,7 @@ export const IconAndTitle = styled.div`
   display: flex;
   align-items: center;
   gap: 16px;
-  font-size:: 20px
+  font-size: 20px;
   margin-bottom: 16px;
   h3 {
     font-size: 32px;

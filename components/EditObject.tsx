@@ -13,7 +13,7 @@ import {
   FieldInfo,
   FieldLabelSpan,
 } from "@/components/StyledBits";
-import { FiBookmark, FiEye } from "react-icons/fi";
+import { FiEye } from "react-icons/fi";
 import { IoBrushOutline } from "react-icons/io5";
 
 type EditObjectProps = {

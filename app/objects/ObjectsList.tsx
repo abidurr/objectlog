@@ -1,11 +1,7 @@
 "use client";
-import { useAtom } from "jotai";
-import { isLoggedInAtom } from "@/components/atoms";
 import type { getObjects } from "@/app/actions";
-import { useState } from "react";
 import Link from "next/link";
 import styled from "styled-components";
-import { theme } from "@/components/theme";
 import {
   LetterIcon,
   ObjectBox,
@@ -69,7 +65,7 @@ const ObjectsList = ({
                     <IoBrushOutline />
                     <FieldLabelSpan>color</FieldLabelSpan>
                     <ColorPill
-                      textclr={object.color}
+                      textclr={object.color ?? "black"}
                       bgclr={getBackgroundForColor(object?.color)}
                     >
                       {object?.color ?? "No color"}

@@ -86,7 +86,7 @@ async function ObjectDetails({ id }: { id: string }) {
               <IoBrushOutline />
               <FieldLabelSpan>color</FieldLabelSpan>
               <ColorPill
-                textclr={object.color}
+                textclr={object.color ?? "black"}
                 bgclr={getBackgroundForColor(object?.color)}
               >
                 {object?.color ?? "Not available"}

@@ -45,6 +45,7 @@ export type Theme = {
     BLUE2: HslaColor;
   };
   BOX_SHADOW: {
+    ELEVATION_1: string;
     ELEVATION_2: string;
     ELEVATION_3: string;
     ELEVATION_4: string;
@@ -86,6 +87,7 @@ const theme = {
   },
   // https://www.joshwcomeau.com/css/designing-shadows/
   BOX_SHADOW: {
+    ELEVATION_1: "0.8px 1.6px 1.6px hsl(0deg 0% 0% / 0.48)",
     ELEVATION_2: "1.6px 3.2px 3.2px hsl(0deg 0% 0% / 0.45)",
     ELEVATION_3: "2.4px 4.8px 4.8px hsl(0deg 0% 0% / 0.43)",
     ELEVATION_4: "3.2px 6.4px 6.4px hsl(0deg 0% 0% / 0.40)",
@@ -157,7 +159,7 @@ const BACKGROUND_RGB = {
 } as const satisfies Record<ColorOption, readonly [number, number, number]>;
 
 export const getBackgroundForColor = (
-  color: string | undefined,
+  color: string | null | undefined,
   opacity = 0.6,
 ): string => {
   if (!color || !Object.hasOwn(BACKGROUND_RGB, color)) {
