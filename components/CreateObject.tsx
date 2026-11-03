@@ -10,7 +10,7 @@ import {
   StyledSelect,
   ObjectBox,
 } from "@/components/StyledBits";
-import { COLOR_OPTIONS } from "@/components/theme";
+import { COLOR_OPTIONS, getBackgroundForColor } from "@/components/theme";
 import { FiEye } from "react-icons/fi";
 import { IoBrushOutline } from "react-icons/io5";
 
@@ -63,7 +63,7 @@ const CreateObject = () => {
         <StyledSelect
           style={{
             margin: "4px 0px 16px 0px",
-            backgroundColor: objectColor || "white",
+            backgroundColor: getBackgroundForColor(objectColor),
           }}
           value={objectColor}
           onChange={(event) => setObjectColor(event.target.value)}

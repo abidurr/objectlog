@@ -14,9 +14,11 @@ import {
   FieldInfo,
   FieldLabelSpan,
   FieldsList,
+  ColorPill,
 } from "@/components/StyledBits";
 import { FiBookmark, FiClock } from "react-icons/fi";
 import { IoBrushOutline } from "react-icons/io5";
+import { getBackgroundForColor } from "../../components/theme";
 
 const ObjectsList = ({
   objects,
@@ -48,7 +50,10 @@ const ObjectsList = ({
             <Link href={`/objects/${object?.id}`}>
               <ObjectBox>
                 <IconAndTitle>
-                  <LetterIcon color={object?.color ?? undefined}>
+                  <LetterIcon
+                    color={object?.color ?? undefined}
+                    bgcolor={getBackgroundForColor(object?.color)}
+                  >
                     {object?.name?.charAt(0).toUpperCase()}
                   </LetterIcon>
                   <h3>{object?.name}</h3>
@@ -63,7 +68,12 @@ const ObjectsList = ({
                   <FieldInfo>
                     <IoBrushOutline />
                     <FieldLabelSpan>color</FieldLabelSpan>
-                    {object?.color ?? "Not available"}
+                    <ColorPill
+                      textclr={object.color}
+                      bgclr={getBackgroundForColor(object?.color)}
+                    >
+                      {object?.color ?? "No color"}
+                    </ColorPill>
                   </FieldInfo>
                   <FieldInfo>
                     <FiClock />

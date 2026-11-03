@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { deleteObject, updateObject } from "@/app/actions";
-import { COLOR_OPTIONS } from "@/components/theme";
+import { COLOR_OPTIONS, getBackgroundForColor } from "@/components/theme";
 import {
   ObjectBox,
   StyledButton,
@@ -99,7 +99,7 @@ const EditObject = ({ objectId, name, color, fields }: EditObjectProps) => {
         <div></div>
         <div>
           <FieldsList>
-            <FieldInfo>
+            {/* <FieldInfo>
               <FiBookmark />
               <FieldLabelSpan>id</FieldLabelSpan>
             </FieldInfo>
@@ -111,7 +111,7 @@ const EditObject = ({ objectId, name, color, fields }: EditObjectProps) => {
               }}
             >
               {objectId}
-            </p>
+            </p> */}
             <FieldInfo>
               <FiEye />
               <FieldLabelSpan>Name</FieldLabelSpan>
@@ -133,7 +133,11 @@ const EditObject = ({ objectId, name, color, fields }: EditObjectProps) => {
             </FieldInfo>
             {/* <label htmlFor={`object-color-${objectId}`}>Color</label> */}
             <StyledSelect
-              style={{ backgroundColor: objectColor?.toLowerCase() || "white" }}
+              style={{
+                backgroundColor: getBackgroundForColor(
+                  objectColor?.toLowerCase(),
+                ),
+              }}
               id={`object-color-${objectId}`}
               value={objectColor}
               onChange={(event) => setObjectColor(event?.target?.value)}

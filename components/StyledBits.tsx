@@ -27,14 +27,34 @@ export const ObjectBox = styled.div`
   }
 `;
 
-export const LetterIcon = styled.div<{ color?: string }>`
+export const ColorPill = styled.div<{
+  textclr: string;
+  bgclr: string;
+}>`
+  display: flex;
+  height: 24px;
+  border-radius: 16px;
+  font-size: 16px;
+  margin: 0px;
+  padding: 4px 16px;
+  line-height: 24px;
+  font-family: monospace;
+  /* border 2px solid ${(p) => p?.textclr || "grey"}; */
+  box-shadow: 2.4px 4.8px 4.8px hsla(0deg 0% 0% / 0.43, 0.4);
+  color: ${(p) => p?.textclr || "black"};
+  background-color: ${(p) => p?.bgclr || "white"};
+`;
+
+export const LetterIcon = styled.div<{ bgcolor?: string; color?: string }>`
   min-width: 48px;
   min-height: 48px;
   border-radius: 50%;
-  color: ${theme.BLACK_TEXT_COLOR};
-  background-color: ${(p) => p.color || theme.PRIMARY_300};
-  opacity: 0.4;
-  /* color: rgba(0, 0, 0, 0.4); */
+  /* color: ${theme.BLACK_TEXT_COLOR}; */
+
+  color: ${(p) => p?.color || theme.BLACK_TEXT_COLOR};
+  background-color: ${(p) => p?.bgcolor || theme.PRIMARY_300};
+  opacity: 0.6;
+  /* color: rgba(0, 0, 0, 0.3); */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,8 +67,8 @@ export const LetterIcon = styled.div<{ color?: string }>`
 
   h3 {
     font-size: 24px;
-    color: ${(p) => p.color || theme.BLACK_TEXT_COLOR};
-    opacity: 1;
+    color: ${(p) => p?.color || theme.BLACK_TEXT_COLOR};
+    /* opacity: 0.4; */
   }
 `;
 
@@ -83,7 +103,7 @@ export const StyledButton = styled.button<{
   text-decoration: none;
   margin-bottom: 16px;
   font-size: 16px;
-  box-shadow: ${theme.BOX_SHADOW.ELEVATION_5};
+  box-shadow: ${theme.BOX_SHADOW.ELEVATION_3};
   &:hover {
     text-decoration: none;
     background-color: ${(p) => {
@@ -132,15 +152,18 @@ export const StyledInput = styled.input`
   width: 100%;
   box-sizing: border-box;
   margin-bottom: 16px;
+  box-shadow: ${theme.BOX_SHADOW.ELEVATION_1};
 `;
 
 export const StyledSelect = styled.select`
   padding: 8px;
   border-radius: 4px;
-  border: 1px solid #ccc;
+  /* border: 1px solid #ccc; */
+  border: 0px;
   width: 100%;
   box-sizing: border-box;
   margin-bottom: 16px;
+  box-shadow: ${theme.BOX_SHADOW.ELEVATION_1};
 `;
 
 export const ObjectsGrid = styled.div`

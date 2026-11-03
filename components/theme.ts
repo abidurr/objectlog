@@ -125,4 +125,46 @@ export const COLOR_OPTIONS = [
 
 export type COLOR_OPTIONS = (typeof COLOR_OPTIONS)[number] | undefined;
 
+type ColorOption = Exclude<COLOR_OPTIONS, undefined>;
+
+const BACKGROUND_RGB = {
+  ruby: [255, 185, 195],
+  gray: [225, 225, 225],
+  gold: [255, 235, 165],
+  bronze: [230, 195, 160],
+  brown: [220, 195, 175],
+  yellow: [255, 255, 175],
+  amber: [255, 225, 165],
+  orange: [255, 205, 165],
+  tomato: [255, 185, 165],
+  red: [255, 185, 185],
+  crimson: [255, 185, 205],
+  pink: [255, 195, 220],
+  plum: [235, 195, 235],
+  purple: [220, 200, 245],
+  violet: [220, 205, 255],
+  iris: [205, 210, 255],
+  indigo: [195, 205, 255],
+  blue: [185, 220, 255],
+  cyan: [180, 240, 250],
+  teal: [180, 230, 225],
+  jade: [185, 235, 210],
+  green: [190, 235, 195],
+  grass: [215, 245, 180],
+  lime: [230, 250, 170],
+  mint: [195, 245, 230],
+  sky: [195, 230, 255],
+} as const satisfies Record<ColorOption, readonly [number, number, number]>;
+
+export const getBackgroundForColor = (
+  color: string | undefined,
+  opacity = 0.6,
+): string => {
+  if (!color || !Object.hasOwn(BACKGROUND_RGB, color)) {
+    return "rgba(0, 0, 0, 0)";
+  }
+  const [red, green, blue] = BACKGROUND_RGB[color as ColorOption];
+  return `rgba(${red}, ${green}, ${blue}, ${opacity})`;
+};
+
 export { theme };

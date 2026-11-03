@@ -17,6 +17,8 @@ import styled from "styled-components";
 import { theme } from "@/components/theme";
 import { FiArrowLeft, FiBookmark, FiClock } from "react-icons/fi";
 import { IoBrushOutline } from "react-icons/io5";
+import { ColorPill } from "@/components/StyledBits";
+import { getBackgroundForColor } from "@/components/theme";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   return (
@@ -64,9 +66,12 @@ async function ObjectDetails({ id }: { id: string }) {
         </StyledButton>
       </Link>
       <ObjectsGrid>
-        <ObjectBox>
+        <ObjectBox style={{ height: "fit-content" }}>
           <IconAndTitle>
-            <LetterIcon color={object?.color ?? undefined}>
+            <LetterIcon
+              color={object?.color ?? undefined}
+              bgcolor={getBackgroundForColor(object?.color)}
+            >
               {object?.name?.charAt(0).toUpperCase()}
             </LetterIcon>
             <h3>{object?.name}</h3>
@@ -80,7 +85,12 @@ async function ObjectDetails({ id }: { id: string }) {
             <FieldInfo>
               <IoBrushOutline />
               <FieldLabelSpan>color</FieldLabelSpan>
-              {object?.color ?? "Not available"}
+              <ColorPill
+                textclr={object.color}
+                bgclr={getBackgroundForColor(object?.color)}
+              >
+                {object?.color ?? "Not available"}
+              </ColorPill>
             </FieldInfo>
             <FieldInfo>
               <FiClock />
