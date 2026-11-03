@@ -6,9 +6,10 @@ export const IconAndTitle = styled.div`
   align-items: center;
   gap: 16px;
   font-size:: 20px
-  margin-bottom: 4px;
+  margin-bottom: 16px;
   h3 {
     font-size: 32px;
+    margin: 18px 0;
   }
 `;
 
