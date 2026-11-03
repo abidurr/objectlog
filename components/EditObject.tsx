@@ -4,6 +4,17 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { deleteObject, updateObject } from "@/app/actions";
 import { COLOR_OPTIONS } from "@/components/theme";
+import {
+  ObjectBox,
+  StyledButton,
+  StyledInput,
+  StyledSelect,
+  FieldsList,
+  FieldInfo,
+  FieldLabelSpan,
+} from "@/components/StyledBits";
+import { FiBookmark, FiEye } from "react-icons/fi";
+import { IoBrushOutline } from "react-icons/io5";
 
 type EditObjectProps = {
   objectId: string;
@@ -82,86 +93,137 @@ const EditObject = ({ objectId, name, color, fields }: EditObjectProps) => {
   };
 
   return (
-    <form onSubmit={saveObject}>
-      <h2>Edit object</h2>
-      <div>
-        <label htmlFor={`object-name-${objectId}`}>Name</label>
-        <input
-          id={`object-name-${objectId}`}
-          value={objectName}
-          onChange={(event) => setObjectName(event.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor={`object-color-${objectId}`}>Color</label>
-        <select
-          id={`object-color-${objectId}`}
-          value={objectColor}
-          onChange={(event) => setObjectColor(event.target.value)}
-        >
-          <option value="">No color</option>
-          {objectColor && !colorOptions.includes(objectColor) && (
-            <option value={objectColor}>Current color ({objectColor})</option>
-          )}
-          {COLOR_OPTIONS.map((colorOption) => (
-            <option key={colorOption} value={colorOption}>
-              {colorOption}
-            </option>
-          ))}
-        </select>
-      </div>
-      <fieldset>
-        <legend>Fields</legend>
-        {fieldNames.map((fieldName, index) => (
-          <div key={index}>
-            <input
-              aria-label={`Field ${index + 1} name`}
-              value={fieldName}
-              onChange={(event) =>
-                setFieldNames((currentFields) =>
-                  currentFields.map((currentName, currentIndex) =>
-                    currentIndex === index ? event.target.value : currentName,
-                  ),
-                )
-              }
-            />
-            <button
-              type="button"
-              onClick={() =>
-                setFieldNames((currentFields) =>
-                  currentFields.filter(
-                    (_, currentIndex) => currentIndex !== index,
-                  ),
-                )
-              }
+    <ObjectBox>
+      <form onSubmit={saveObject}>
+        <h2>Edit object</h2>
+        <div></div>
+        <div>
+          <FieldsList>
+            <FieldInfo>
+              <FiBookmark />
+              <FieldLabelSpan>id</FieldLabelSpan>
+            </FieldInfo>
+            <p
+              style={{
+                fontSize: "16px",
+                fontFamily: "monospace",
+                marginBottom: "16px",
+              }}
             >
-              Remove field
-            </button>
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={() =>
-            setFieldNames((currentFields) => [...currentFields, ""])
-          }
-        >
-          Add field
-        </button>
-      </fieldset>
-      <button type="submit" disabled={isSaving || isDeleting}>
-        {isSaving ? "Saving..." : "Save changes"}
-      </button>
-      <button
-        type="button"
-        onClick={removeObject}
-        disabled={isSaving || isDeleting}
-      >
-        {isDeleting ? "Deleting..." : "Delete object"}
-      </button>
-      {message && <p role="status">{message}</p>}
-      {error && <p role="alert">{error}</p>}
-    </form>
+              {objectId}
+            </p>
+            <FieldInfo>
+              <FiEye />
+              <FieldLabelSpan>Name</FieldLabelSpan>
+            </FieldInfo>
+
+            <FieldInfo>
+              {/* <label htmlFor={`object-name-${objectId}`}>Name</label> */}
+              <StyledInput
+                id={`object-name-${objectId}`}
+                value={objectName}
+                onChange={(event) => setObjectName(event.target.value)}
+                required
+              />
+            </FieldInfo>
+            <FieldInfo>
+              <IoBrushOutline />
+              <FieldLabelSpan>Color</FieldLabelSpan>
+              {/* {object?.color ?? "Not available"} */}
+            </FieldInfo>
+            {/* <label htmlFor={`object-color-${objectId}`}>Color</label> */}
+            <StyledSelect
+              id={`object-color-${objectId}`}
+              value={objectColor}
+              onChange={(event) => setObjectColor(event.target.value)}
+            >
+              <option value="">No color</option>
+              {objectColor && !colorOptions.includes(objectColor) && (
+                <option value={objectColor}>
+                  Current color ({objectColor})
+                </option>
+              )}
+              {[...COLOR_OPTIONS]
+                .sort((a, b) => a.localeCompare(b))
+                .map((colorOption) => (
+                  <option
+                    key={colorOption}
+                    value={colorOption}
+                    label={`${
+                      colorOption.charAt(0).toUpperCase() + colorOption.slice(1)
+                    }`}
+                  >
+                    {colorOption}
+                  </option>
+                ))}
+            </StyledSelect>
+            {/* <FieldLabelSpan>{objectName}</FieldLabelSpan> */}
+
+            {/* <FieldInfo>
+              <FiClock />
+              <FieldLabelSpan>updated</FieldLabelSpan>
+            </FieldInfo> */}
+          </FieldsList>
+        </div>
+        {/* <fieldset>
+          <legend>Fields</legend>
+          {fieldNames.map((fieldName, index) => (
+            <div key={index}>
+              <input
+                aria-label={`Field ${index + 1} name`}
+                value={fieldName}
+                onChange={(event) =>
+                  setFieldNames((currentFields) =>
+                    currentFields.map((currentName, currentIndex) =>
+                      currentIndex === index ? event.target.value : currentName,
+                    ),
+                  )
+                }
+              />
+              <StyledButton
+                type="button"
+                onClick={() =>
+                  setFieldNames((currentFields) =>
+                    currentFields.filter(
+                      (_, currentIndex) => currentIndex !== index,
+                    ),
+                  )
+                }
+              >
+                Remove field
+              </StyledButton>
+            </div>
+          ))}
+          <StyledButton
+            type="button"
+            onClick={() =>
+              setFieldNames((currentFields) => [...currentFields, ""])
+            }
+          >
+            Add field
+          </StyledButton>
+        </fieldset> */}
+        <div style={{ display: "flex", gap: "8px", marginTop: "16px" }}>
+          <StyledButton
+            style={{ backgroundColor: "rgba(76, 175, 80, 0.4)" }}
+            type="submit"
+            disabled={isSaving || isDeleting}
+          >
+            {isSaving ? "Saving..." : "Save Changes"}
+          </StyledButton>
+          <StyledButton
+            style={{ backgroundColor: "rgba(244, 67, 54, 0.4)" }}
+            type="button"
+            onClick={removeObject}
+            disabled={isSaving || isDeleting}
+          >
+            {isDeleting ? "Deleting..." : "Delete"}
+          </StyledButton>
+        </div>
+        {message && <p role="status">{message}</p>}
+        {error && <p role="alert">{error}</p>}
+      </form>
+    </ObjectBox>
   );
 };
 

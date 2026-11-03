@@ -9,8 +9,9 @@ import {
   IconAndTitle,
   StyledButton,
   FieldInfo,
+  ObjectsGrid,
+  EditObject,
 } from "@/components/";
-import { EditObject } from "@/components/EditObject";
 import Link from "next/link";
 import styled from "styled-components";
 import { theme } from "@/components/theme";
@@ -62,42 +63,44 @@ async function ObjectDetails({ id }: { id: string }) {
           Back to Objects
         </StyledButton>
       </Link>
-      <ObjectBox>
-        <IconAndTitle>
-          <LetterIcon color={object?.color ?? undefined}>
-            {object?.name?.charAt(0).toUpperCase()}
-          </LetterIcon>
-          <h3>{object?.name}</h3>
-        </IconAndTitle>
-        <FieldsList>
-          <FieldInfo>
-            <FiBookmark />
-            <FieldLabelSpan>id</FieldLabelSpan>
-            <FieldLabelSpan>{object?.id}</FieldLabelSpan>
-          </FieldInfo>
-          <FieldInfo>
-            <IoBrushOutline />
-            <FieldLabelSpan>color</FieldLabelSpan>
-            {object?.color ?? "Not available"}
-          </FieldInfo>
-          <FieldInfo>
-            <FiClock />
-            <FieldLabelSpan>updated</FieldLabelSpan>
-            {object?.updatedAt?.toLocaleString() ?? "Not available"}
-          </FieldInfo>
-          <FieldInfo>
-            <FiClock />
-            <FieldLabelSpan>created</FieldLabelSpan>
-            {object?.createdAt?.toLocaleString() ?? "Not available"}
-          </FieldInfo>
-        </FieldsList>
-      </ObjectBox>
-      <EditObject
-        objectId={object.id}
-        name={object.name}
-        color={object.color}
-        fields={object.fields}
-      />
+      <ObjectsGrid>
+        <ObjectBox>
+          <IconAndTitle>
+            <LetterIcon color={object?.color ?? undefined}>
+              {object?.name?.charAt(0).toUpperCase()}
+            </LetterIcon>
+            <h3>{object?.name}</h3>
+          </IconAndTitle>
+          <FieldsList>
+            <FieldInfo>
+              <FiBookmark />
+              <FieldLabelSpan>id</FieldLabelSpan>
+              <FieldLabelSpan>{object?.id}</FieldLabelSpan>
+            </FieldInfo>
+            <FieldInfo>
+              <IoBrushOutline />
+              <FieldLabelSpan>color</FieldLabelSpan>
+              {object?.color ?? "Not available"}
+            </FieldInfo>
+            <FieldInfo>
+              <FiClock />
+              <FieldLabelSpan>updated</FieldLabelSpan>
+              {object?.updatedAt?.toLocaleString() ?? "Not available"}
+            </FieldInfo>
+            <FieldInfo>
+              <FiClock />
+              <FieldLabelSpan>created</FieldLabelSpan>
+              {object?.createdAt?.toLocaleString() ?? "Not available"}
+            </FieldInfo>
+          </FieldsList>
+        </ObjectBox>
+        <EditObject
+          objectId={object.id}
+          name={object.name}
+          color={object.color}
+          fields={object.fields}
+        />
+      </ObjectsGrid>
       <h1>{object?.name}</h1>
       <dl>
         <dt>ID</dt>

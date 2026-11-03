@@ -7,3 +7,4 @@ export * from "./UserNavigation";
 export * from "./theme";
 export * from "./CreateObject";
 export * from "./StyledBits";
+export * from "./EditObject";

@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import { Header, Container, LoggedInUser, UserNavigation } from "@/components";
+import { Header, Container, UserNavigation } from "@/components";
+import { LoggedInUser } from "@/components/LoggedInUser";
 
 export default function Profile() {
   return (

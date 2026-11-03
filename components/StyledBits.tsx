@@ -66,11 +66,49 @@ export const StyledButton = styled.button`
   text-decoration: none;
   margin-bottom: 16px;
   font-size: 16px;
-
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) 0 4px 8px rgba(0, 0, 0, 0.1);
   &:hover {
     text-decoration: none;
     background-color: ${theme.PRIMARY_800};
   }
+`;
+
+export const FieldLabelSpan = styled.span`
+  display: inline-block;
+  /* color: ${theme.PRIMARY_800}; */
+  opacity: 0.4;
+  font-family: monospace;
+  font-size: 16px;
+  margin-right: 8px;
+  min-width: 80px;
+`;
+
+export const FieldsList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  p {
+    margin: 0;
+    padding: 0;
+  }
+`;
+
+export const StyledInput = styled.input`
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 16px;
+`;
+
+export const StyledSelect = styled.select`
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 16px;
 `;
 
 export const ObjectsGrid = styled.div`

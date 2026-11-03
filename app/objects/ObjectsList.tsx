@@ -12,6 +12,8 @@ import {
   IconAndTitle,
   ObjectsGrid,
   FieldInfo,
+  FieldLabelSpan,
+  FieldsList,
 } from "@/components/StyledBits";
 import { FiBookmark, FiClock } from "react-icons/fi";
 import { IoBrushOutline } from "react-icons/io5";
@@ -77,26 +79,6 @@ const ObjectsList = ({
     </StyledObjects>
   );
 };
-
-const FieldLabelSpan = styled.span`
-  display: inline-block;
-  /* color: ${theme.PRIMARY_800}; */
-  opacity: 0.4;
-  font-family: monospace;
-  font-size: 16px;
-  margin-right: 8px;
-  min-width: 80px;
-`;
-
-const FieldsList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  p {
-    margin: 0;
-    padding: 0;
-  }
-`;
 
 const StyledObjects = styled.div`
   a {
