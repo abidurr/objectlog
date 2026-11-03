@@ -208,7 +208,7 @@ const EditObject = ({ objectId, name, color, fields }: EditObjectProps) => {
             Add field
           </StyledButton>
         </fieldset> */}
-        <div style={{ display: "flex", gap: "8px", marginTop: "16px" }}>
+        <div style={{ display: "flex", gap: "16px", marginTop: "16px" }}>
           <StyledButton
             buttonColor="green"
             // style={{ backgroundColor: "rgba(76, 175, 80, 0.4)" }}
