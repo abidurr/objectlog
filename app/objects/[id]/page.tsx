@@ -114,7 +114,6 @@ async function ObjectDetails({ id }: { id: string }) {
           objectId={object.id}
           name={object.name}
           color={object.color}
-          fields={object.fields}
         />
       </ObjectsGrid>
       <h1>{object?.name}</h1>
