@@ -20,17 +20,13 @@ type EditObjectProps = {
   objectId: string;
   name: string;
   color: string | null;
-  fields: { id: string; name: string }[];
 };
 
-const EditObject = ({ objectId, name, color, fields }: EditObjectProps) => {
+const EditObject = ({ objectId, name, color }: EditObjectProps) => {
   const router = useRouter();
   const colorOptions: readonly string[] = COLOR_OPTIONS;
   const [objectName, setObjectName] = useState(name);
   const [objectColor, setObjectColor] = useState(color ?? "");
-  const [fieldNames, setFieldNames] = useState(
-    fields.map((field) => field.name),
-  );
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [areYouSure, setAreYouSure] = useState(false);
@@ -58,15 +54,10 @@ const EditObject = ({ objectId, name, color, fields }: EditObjectProps) => {
         input: {
           name: trimmedName,
           color: objectColor.trim() || null,
-          fields: fieldNames
-            .map((fieldName) => fieldName.trim())
-            .filter(Boolean)
-            .map((fieldName) => ({ name: fieldName })),
         },
       });
       setObjectName(updatedObject.name);
       setObjectColor(updatedObject.color ?? "");
-      setFieldNames(updatedObject.fields.map((field) => field.name));
       setMessage("Object updated.");
     } catch {
       setError("Could not update object. Please try again.");
@@ -96,30 +87,14 @@ const EditObject = ({ objectId, name, color, fields }: EditObjectProps) => {
   return (
     <ObjectBox>
       <form onSubmit={saveObject}>
-        {/* <h2>Edit object</h2> */}
-        {/* <div></div> */}
         <div>
           <FieldsList>
-            {/* <FieldInfo>
-              <FiBookmark />
-              <FieldLabelSpan>id</FieldLabelSpan>
-            </FieldInfo>
-            <p
-              style={{
-                fontSize: "16px",
-                fontFamily: "monospace",
-                marginBottom: "16px",
-              }}
-            >
-              {objectId}
-            </p> */}
             <FieldInfo>
               <FiEye />
               <FieldLabelSpan>Name</FieldLabelSpan>
             </FieldInfo>
 
             <FieldInfo>
-              {/* <label htmlFor={`object-name-${objectId}`}>Name</label> */}
               <StyledInput
                 id={`object-name-${objectId}`}
                 value={objectName}
@@ -130,9 +105,7 @@ const EditObject = ({ objectId, name, color, fields }: EditObjectProps) => {
             <FieldInfo>
               <IoBrushOutline />
               <FieldLabelSpan>Color</FieldLabelSpan>
-              {/* {object?.color ?? "Not available"} */}
             </FieldInfo>
-            {/* <label htmlFor={`object-color-${objectId}`}>Color</label> */}
             <StyledSelect
               style={{
                 backgroundColor: getBackgroundForColor(
@@ -163,52 +136,8 @@ const EditObject = ({ objectId, name, color, fields }: EditObjectProps) => {
                   </option>
                 ))}
             </StyledSelect>
-            {/* <FieldLabelSpan>{objectName}</FieldLabelSpan> */}
-
-            {/* <FieldInfo>
-              <FiClock />
-              <FieldLabelSpan>updated</FieldLabelSpan>
-            </FieldInfo> */}
           </FieldsList>
         </div>
-        {/* <fieldset>
-          <legend>Fields</legend>
-          {fieldNames.map((fieldName, index) => (
-            <div key={index}>
-              <input
-                aria-label={`Field ${index + 1} name`}
-                value={fieldName}
-                onChange={(event) =>
-                  setFieldNames((currentFields) =>
-                    currentFields.map((currentName, currentIndex) =>
-                      currentIndex === index ? event.target.value : currentName,
-                    ),
-                  )
-                }
-              />
-              <StyledButton
-                type="button"
-                onClick={() =>
-                  setFieldNames((currentFields) =>
-                    currentFields.filter(
-                      (_, currentIndex) => currentIndex !== index,
-                    ),
-                  )
-                }
-              >
-                Remove field
-              </StyledButton>
-            </div>
-          ))}
-          <StyledButton
-            type="button"
-            onClick={() =>
-              setFieldNames((currentFields) => [...currentFields, ""])
-            }
-          >
-            Add field
-          </StyledButton>
-        </fieldset> */}
         <div
           style={{
             display: "flex",

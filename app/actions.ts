@@ -61,13 +61,14 @@ export async function createObject({
         createdAt: new Date(),
         updatedAt: new Date(),
         color: input?.color || "blue",
-        fields: input.fields?.length
-          ? {
-              create: input.fields.map((field) => ({
-                name: field.name,
-              })),
-            }
-          : undefined,
+        fields: undefined,
+        // input.fields?.length
+        //   ? {
+        //       create: input.fields.map((field) => ({
+        //         name: field.name,
+        //       })),
+        //     }
+        //   : undefined,
       },
       include: {
         fields: true,
@@ -84,7 +85,6 @@ export async function createObject({
 
 type UpdateObjectInput = {
   name?: string;
-  fields?: { name: string }[];
   color?: string | null;
 };
 
@@ -110,11 +110,7 @@ export async function updateObject({
     throw new Error("Unauthorized");
   }
 
-  if (
-    !input.name?.trim() &&
-    input.color === undefined &&
-    input.fields === undefined
-  ) {
+  if (!input.name?.trim() && input.color === undefined) {
     throw new Error("No updates provided");
   }
 
@@ -126,18 +122,127 @@ export async function updateObject({
     data: {
       name: input.name?.trim() || undefined,
       color: input.color,
-      fields:
-        input.fields === undefined
-          ? undefined
-          : {
-              deleteMany: {},
-              create: input.fields.map((field) => ({ name: field.name })),
-            },
+      // fields:
+      //   input.fields === undefined
+      //     ? undefined
+      //     : {
+      //         deleteMany: {},
+      //         create: input.fields.map((field) => ({ name: field.name })),
+      //       },
     },
     include: {
       fields: true,
     },
   });
+
+  revalidatePath("/objects");
+  revalidatePath(`/objects/${objectId}`);
+  return object;
+}
+
+export async function updateObjectFields({
+  objectId,
+  fields,
+}: {
+  objectId: string;
+  fields: {
+    id?: string;
+    name: string;
+    fieldType?:
+      | "TEXT"
+      | "LONGTEXT"
+      | "DATE"
+      | "DATETIME"
+      | "SELECT"
+      | "MULTISELECT"
+      | "ROUNDNUMBER";
+    options?: string[];
+    canEdit?: boolean;
+    visible?: boolean;
+  }[];
+}) {
+  const session = await auth0.getSession();
+  const email = session?.user?.email?.toLowerCase();
+
+  if (!email) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  const object = await prisma.$transaction(async (transaction) => {
+    const ownedObject = await transaction.object.findFirst({
+      where: { id: objectId, userId: user.id },
+      select: { id: true },
+    });
+
+    if (!ownedObject) {
+      throw new Error("Object not found");
+    }
+
+    const existingFields = await transaction.field.findMany({
+      where: { objectId },
+      select: { id: true },
+    });
+    const existingIds = new Set(existingFields.map((field) => field.id));
+    const retainedIds = new Set<string>();
+
+    for (const field of fields) {
+      if (!field.id) {
+        continue;
+      }
+      if (!existingIds.has(field.id) || retainedIds.has(field.id)) {
+        throw new Error("Invalid field ID");
+      }
+      retainedIds.add(field.id);
+    }
+
+    const removedIds = existingFields
+      .filter((field) => !retainedIds.has(field.id))
+      .map((field) => field.id);
+
+    if (removedIds.length > 0) {
+      await transaction.field.deleteMany({
+        where: { objectId, id: { in: removedIds } },
+      });
+    }
+
+    for (const field of fields) {
+      const data = {
+        name: field.name,
+        fieldType: field.fieldType ?? "TEXT",
+        options: field.options ?? [],
+        canEdit: field.canEdit ?? true,
+        visible: field.visible ?? true,
+      };
+
+      if (field.id) {
+        await transaction.field.update({
+          where: { id: field.id },
+          data,
+        });
+      } else {
+        await transaction.field.create({
+          data: { ...data, objectId },
+        });
+      }
+    }
+
+    return transaction.object.findUnique({
+      where: { id: objectId },
+      include: { fields: true },
+    });
+  });
+
+  if (!object) {
+    throw new Error("Object not found");
+  }
 
   revalidatePath("/objects");
   revalidatePath(`/objects/${objectId}`);
