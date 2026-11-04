@@ -11,6 +11,7 @@ import {
   FieldInfo,
   ObjectsGrid,
   EditObject,
+  ObjectFields,
 } from "@/components/";
 import Link from "next/link";
 import styled from "styled-components";
@@ -70,8 +71,8 @@ async function ObjectDetails({ id }: { id: string }) {
         <ObjectBox style={{ height: "fit-content" }}>
           <IconAndTitle>
             <LetterIcon
-              color={object?.color ?? undefined}
-              bgcolor={getBackgroundForColor(object?.color)}
+              $color={object?.color ?? undefined}
+              $bgcolor={getBackgroundForColor(object?.color)}
             >
               {object?.name?.charAt(0).toUpperCase()}
             </LetterIcon>
@@ -87,8 +88,8 @@ async function ObjectDetails({ id }: { id: string }) {
               <IoBrushOutline />
               <FieldLabelSpan>color</FieldLabelSpan>
               <ColorPill
-                textclr={object.color ?? "black"}
-                bgclr={getBackgroundForColor(object?.color)}
+                $textclr={object.color ?? "black"}
+                $bgclr={getBackgroundForColor(object?.color)}
               >
                 {object?.color ?? "Not available"}
               </ColorPill>
@@ -116,6 +117,7 @@ async function ObjectDetails({ id }: { id: string }) {
           color={object.color}
         />
       </ObjectsGrid>
+      <ObjectFields objectId={object.id} fields={object.fields} />
       <h1>{object?.name}</h1>
       <dl>
         <dt>ID</dt>
@@ -131,22 +133,6 @@ async function ObjectDetails({ id }: { id: string }) {
         <dd>{object?.createdAt?.toLocaleDateString() ?? "Not available"}</dd>
         <dt>color</dt>
         <dd>{object?.color ?? "Not available"}</dd>
-        <dt>Fields</dt>
-        <dd>
-          {object ? (
-            object.fields.length > 0 ? (
-              <ul>
-                {object.fields.map((field) => (
-                  <li key={field.id}>{field.name}</li>
-                ))}
-              </ul>
-            ) : (
-              "None"
-            )
-          ) : (
-            "Object not found"
-          )}
-        </dd>
       </dl>
     </>
   );

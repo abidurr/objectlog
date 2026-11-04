@@ -176,68 +176,66 @@ export async function updateObjectFields({
     throw new Error("Unauthorized");
   }
 
-  const object = await prisma.$transaction(async (transaction) => {
-    const ownedObject = await transaction.object.findFirst({
-      where: { id: objectId, userId: user.id },
-      select: { id: true },
-    });
+  const ownedObject = await prisma.object.findFirst({
+    where: { id: objectId, userId: user.id },
+    select: { id: true },
+  });
 
-    if (!ownedObject) {
-      throw new Error("Object not found");
+  if (!ownedObject) {
+    throw new Error("Object not found");
+  }
+
+  const existingFields = await prisma.field.findMany({
+    where: { objectId },
+    select: { id: true },
+  });
+  const existingIds = new Set(existingFields.map((field) => field.id));
+  const retainedIds = new Set<string>();
+
+  for (const field of fields) {
+    if (!field.id) {
+      continue;
     }
-
-    const existingFields = await transaction.field.findMany({
-      where: { objectId },
-      select: { id: true },
-    });
-    const existingIds = new Set(existingFields.map((field) => field.id));
-    const retainedIds = new Set<string>();
-
-    for (const field of fields) {
-      if (!field.id) {
-        continue;
-      }
-      if (!existingIds.has(field.id) || retainedIds.has(field.id)) {
-        throw new Error("Invalid field ID");
-      }
-      retainedIds.add(field.id);
+    if (!existingIds.has(field.id) || retainedIds.has(field.id)) {
+      throw new Error("Invalid field ID");
     }
+    retainedIds.add(field.id);
+  }
 
-    const removedIds = existingFields
-      .filter((field) => !retainedIds.has(field.id))
-      .map((field) => field.id);
+  for (const field of fields) {
+    const data = {
+      name: field.name,
+      fieldType: field.fieldType ?? "TEXT",
+      options: field.options ?? [],
+      canEdit: field.canEdit ?? true,
+      visible: field.visible ?? true,
+    };
 
-    if (removedIds.length > 0) {
-      await transaction.field.deleteMany({
-        where: { objectId, id: { in: removedIds } },
+    if (field.id) {
+      await prisma.field.update({
+        where: { id: field.id },
+        data,
+      });
+    } else {
+      await prisma.field.create({
+        data: { ...data, objectId },
       });
     }
+  }
 
-    for (const field of fields) {
-      const data = {
-        name: field.name,
-        fieldType: field.fieldType ?? "TEXT",
-        options: field.options ?? [],
-        canEdit: field.canEdit ?? true,
-        visible: field.visible ?? true,
-      };
+  const removedIds = existingFields
+    .filter((field) => !retainedIds.has(field.id))
+    .map((field) => field.id);
 
-      if (field.id) {
-        await transaction.field.update({
-          where: { id: field.id },
-          data,
-        });
-      } else {
-        await transaction.field.create({
-          data: { ...data, objectId },
-        });
-      }
-    }
-
-    return transaction.object.findUnique({
-      where: { id: objectId },
-      include: { fields: true },
+  if (removedIds.length > 0) {
+    await prisma.field.deleteMany({
+      where: { objectId, id: { in: removedIds } },
     });
+  }
+
+  const object = await prisma.object.findUnique({
+    where: { id: objectId },
+    include: { fields: true },
   });
 
   if (!object) {
