@@ -75,11 +75,25 @@ model Organization {
   @@map("organizations")
 }
 
+enum FieldType {
+  TEXT
+  LONGTEXT
+  DATE
+  DATETIME
+  SELECT
+  MULTISELECT
+  ROUNDNUMBER
+}
+
 model Field {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  name     String
-  objectId String @db.ObjectId
-  object   Object @relation(fields: [objectId], references: [id])
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  fieldType FieldType @default(TEXT)
+  options   String[]  @default([])
+  objectId  String    @db.ObjectId
+  object    Object    @relation(fields: [objectId], references: [id])
+  canEdit   Boolean   @default(true)
+  visible   Boolean   @default(true)
 
   @@map("fields")
 }
