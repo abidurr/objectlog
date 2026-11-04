@@ -48,8 +48,8 @@ const ObjectsList = ({
               <ObjectBox>
                 <IconAndTitle>
                   <LetterIcon
-                    color={object?.color ?? undefined}
-                    bgcolor={getBackgroundForColor(object?.color)}
+                    $color={object?.color ?? undefined}
+                    $bgcolor={getBackgroundForColor(object?.color)}
                   >
                     {object?.name?.charAt(0).toUpperCase()}
                   </LetterIcon>
@@ -66,8 +66,8 @@ const ObjectsList = ({
                     <IoBrushOutline />
                     <FieldLabelSpan>color</FieldLabelSpan>
                     <ColorPill
-                      textclr={object.color ?? "black"}
-                      bgclr={getBackgroundForColor(object?.color)}
+                      $textclr={object.color ?? "black"}
+                      $bgclr={getBackgroundForColor(object?.color)}
                     >
                       {object?.color ?? "No color"}
                     </ColorPill>

@@ -28,8 +28,8 @@ export const ObjectBox = styled.div`
 `;
 
 export const ColorPill = styled.div<{
-  textclr: string;
-  bgclr: string;
+  $textclr: string;
+  $bgclr: string;
 }>`
   display: flex;
   height: 24px;
@@ -39,20 +39,23 @@ export const ColorPill = styled.div<{
   padding: 4px 16px;
   line-height: 24px;
   font-family: monospace;
-  /* border 2px solid ${(p) => p?.textclr || "grey"}; */
+  /* border 2px solid ${(p) => p.$textclr || "grey"}; */
   box-shadow: 2.4px 4.8px 4.8px hsla(0deg 0% 0% / 0.43, 0.4);
-  color: ${(p) => p?.textclr || "black"};
-  background-color: ${(p) => p?.bgclr || "white"};
+  color: ${(p) => p.$textclr || "black"};
+  background-color: ${(p) => p.$bgclr || "white"};
 `;
 
-export const LetterIcon = styled.div<{ bgcolor?: string; color?: string }>`
+export const LetterIcon = styled.div<{
+  $bgcolor?: string;
+  $color?: string;
+}>`
   min-width: 48px;
   min-height: 48px;
   border-radius: 50%;
   /* color: ${theme.BLACK_TEXT_COLOR}; */
 
-  color: ${(p) => p?.color || theme.BLACK_TEXT_COLOR};
-  background-color: ${(p) => p?.bgcolor || theme.PRIMARY_300};
+  color: ${(p) => p.$color || theme.BLACK_TEXT_COLOR};
+  background-color: ${(p) => p.$bgcolor || theme.PRIMARY_300};
   opacity: 0.6;
   /* color: rgba(0, 0, 0, 0.3); */
   display: flex;
@@ -67,16 +70,16 @@ export const LetterIcon = styled.div<{ bgcolor?: string; color?: string }>`
 
   h3 {
     font-size: 24px;
-    color: ${(p) => p?.color || theme.BLACK_TEXT_COLOR};
+    color: ${(p) => p.$color || theme.BLACK_TEXT_COLOR};
     /* opacity: 0.4; */
   }
 `;
 
 export const StyledButton = styled.button<{
-  btnclr?: "red" | "blue" | "green" | "yellow" | "orange";
+  $btnclr?: "red" | "blue" | "green" | "yellow" | "orange";
 }>`
   background-color: ${(p) => {
-    switch (p.btnclr) {
+    switch (p.$btnclr) {
       case "red":
         return theme.TRANSLUCENT.RED1;
       case "blue":
@@ -114,7 +117,7 @@ export const StyledButton = styled.button<{
   &:hover {
     text-decoration: none;
     background-color: ${(p) => {
-      switch (p.btnclr) {
+      switch (p.$btnclr) {
         case "red":
           return theme.TRANSLUCENT.RED2;
         case "blue":

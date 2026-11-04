@@ -147,7 +147,7 @@ const EditObject = ({ objectId, name, color }: EditObjectProps) => {
           }}
         >
           <StyledButton
-            btnclr="green"
+            $btnclr="green"
             type="submit"
             disabled={isSaving || isDeleting}
           >
@@ -156,7 +156,7 @@ const EditObject = ({ objectId, name, color }: EditObjectProps) => {
           </StyledButton>
           {!areYouSure && (
             <StyledButton
-              btnclr="red"
+              $btnclr="red"
               type="button"
               onClick={() => setAreYouSure(true)}
               disabled={isSaving || isDeleting || areYouSure}
@@ -174,13 +174,13 @@ const EditObject = ({ objectId, name, color }: EditObjectProps) => {
               </p>
               <StyledButton
                 onClick={() => setAreYouSure(false)}
-                btnclr="green"
+                $btnclr="green"
                 disabled={isSaving || isDeleting}
               >
                 No, go back
               </StyledButton>
               <StyledButton
-                btnclr="red"
+                $btnclr="red"
                 type="button"
                 onClick={removeObject}
                 disabled={isSaving || isDeleting}
