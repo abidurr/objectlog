@@ -88,6 +88,17 @@ const EditObject = ({ objectId, name, color }: EditObjectProps) => {
     <ObjectBox>
       <form onSubmit={saveObject}>
         <div>
+          {!areYouSure && (
+            <StyledButton
+              $btnclr="red"
+              type="button"
+              onClick={() => setAreYouSure(true)}
+              disabled={isSaving || isDeleting || areYouSure}
+            >
+              <FiTrash2 />
+              {isDeleting ? "Deleting..." : `Delete Object`}
+            </StyledButton>
+          )}
           <FieldsList>
             <FieldInfo>
               <FiEye />
@@ -154,17 +165,6 @@ const EditObject = ({ objectId, name, color }: EditObjectProps) => {
             <FiEdit />
             {isSaving ? "Saving..." : "Edit Object"}
           </StyledButton>
-          {!areYouSure && (
-            <StyledButton
-              $btnclr="red"
-              type="button"
-              onClick={() => setAreYouSure(true)}
-              disabled={isSaving || isDeleting || areYouSure}
-            >
-              <FiTrash2 />
-              {isDeleting ? "Deleting..." : `Delete Object`}
-            </StyledButton>
-          )}
 
           {areYouSure && (
             <>
