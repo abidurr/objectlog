@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import { auth0 } from "@/lib/auth0";
 import { revalidatePath } from "next/cache";
+import { Prisma } from "@prisma/client";
 
 // READ actions
 export async function getUsers() {
@@ -137,6 +138,7 @@ export async function updateObject({
 
   revalidatePath("/objects");
   revalidatePath(`/objects/${objectId}`);
+  revalidatePath("/fields");
   return object;
 }
 
@@ -244,7 +246,139 @@ export async function updateObjectFields({
 
   revalidatePath("/objects");
   revalidatePath(`/objects/${objectId}`);
+  revalidatePath("/fields");
   return object;
+}
+
+type RecordFieldType =
+  | "TEXT"
+  | "LONGTEXT"
+  | "DATE"
+  | "DATETIME"
+  | "SELECT"
+  | "MULTISELECT"
+  | "ROUNDNUMBER";
+
+type RecordFieldInputValue = string | string[] | number | null;
+
+const RECORD_VALUE_KEYS: Record<RecordFieldType, string> = {
+  TEXT: "text_value",
+  LONGTEXT: "longtext_value",
+  DATE: "date_value",
+  DATETIME: "datetime_value",
+  SELECT: "select_value",
+  MULTISELECT: "multiselect_value",
+  ROUNDNUMBER: "roundnumber_value",
+};
+
+function normalizeRecordFieldValue(
+  fieldType: RecordFieldType,
+  options: string[],
+  input: RecordFieldInputValue | undefined,
+): RecordFieldInputValue {
+  switch (fieldType) {
+    case "TEXT":
+    case "LONGTEXT":
+    case "DATE":
+    case "DATETIME":
+    case "SELECT": {
+      const value = input ?? "";
+      if (typeof value !== "string") {
+        throw new Error("Invalid field value");
+      }
+      if (fieldType === "SELECT" && value && !options.includes(value)) {
+        throw new Error("Invalid select option");
+      }
+      return value;
+    }
+    case "MULTISELECT": {
+      const value = input ?? [];
+      if (
+        !Array.isArray(value) ||
+        !value.every((option) => typeof option === "string") ||
+        value.some((option) => !options.includes(option))
+      ) {
+        throw new Error("Invalid multiselect options");
+      }
+      return value;
+    }
+    case "ROUNDNUMBER": {
+      if (input === null || input === undefined || input === "") {
+        return null;
+      }
+      if (typeof input !== "number" || !Number.isFinite(input)) {
+        throw new Error("Invalid number value");
+      }
+      return input;
+    }
+  }
+}
+
+export async function createRecord({
+  objectId,
+  name,
+  values,
+}: {
+  objectId: string;
+  name: string;
+  values: Record<string, RecordFieldInputValue>;
+}) {
+  const session = await auth0.getSession();
+  const email = session?.user?.email?.toLowerCase();
+
+  if (!email) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  const recordName = name.trim();
+  if (!recordName) {
+    throw new Error("A record name is required");
+  }
+
+  const object = await prisma.object.findFirst({
+    where: { id: objectId, userId: user.id },
+    include: { fields: true },
+  });
+  if (!object) {
+    throw new Error("Object not found");
+  }
+
+  const fieldIds = new Set(object.fields.map((field) => field.id));
+  if (Object.keys(values).some((fieldId) => !fieldIds.has(fieldId))) {
+    throw new Error("Invalid field ID");
+  }
+
+  const recordFields: Record<string, Prisma.InputJsonValue> = {};
+  for (const field of object.fields) {
+    const fieldType = field.fieldType as RecordFieldType;
+    const input = field.visible && field.canEdit ? values[field.id] : undefined;
+    const value = normalizeRecordFieldValue(fieldType, field.options, input);
+    recordFields[field.id] = {
+      field_id: field.id,
+      field_name: field.name,
+      field_type: fieldType,
+      [RECORD_VALUE_KEYS[fieldType]]: value,
+      computed_value: value,
+    };
+  }
+
+  const record = await prisma.record.create({
+    data: {
+      name: recordName,
+      objectId,
+      fields: recordFields,
+    },
+    select: { id: true },
+  });
+
+  revalidatePath(`/objects/${objectId}`);
+  revalidatePath("/fields");
+  return record;
 }
 
 export async function deleteObject(objectId: string) {
@@ -313,6 +447,32 @@ export async function getObjects(userEmail: string) {
   } catch (error: unknown) {
     throw new Error((error as Error).message);
   }
+}
+
+export async function getObjectsWithRecentRecords() {
+  const session = await auth0.getSession();
+  const email = session?.user?.email?.toLowerCase();
+
+  if (!email) {
+    return [];
+  }
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) {
+    return [];
+  }
+
+  return prisma.object.findMany({
+    where: { userId: user.id },
+    orderBy: { updatedAt: "desc" },
+    include: {
+      fields: true,
+      records: {
+        orderBy: { createdAt: "desc" },
+        take: 5,
+      },
+    },
+  });
 }
 
 export async function getObject(objectId: string) {
