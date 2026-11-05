@@ -118,7 +118,7 @@ async function ObjectDetails({ id }: { id: string }) {
         />
       </ObjectsGrid>
       <ObjectFields objectId={object.id} fields={object.fields} />
-      <h1>{object?.name}</h1>
+      {/* <h1>{object?.name}</h1>
       <dl>
         <dt>ID</dt>
         <dd>{id}</dd>
@@ -133,7 +133,7 @@ async function ObjectDetails({ id }: { id: string }) {
         <dd>{object?.createdAt?.toLocaleDateString() ?? "Not available"}</dd>
         <dt>color</dt>
         <dd>{object?.color ?? "Not available"}</dd>
-      </dl>
+      </dl> */}
     </>
   );
 }
