@@ -9,6 +9,7 @@ import {
   StyledButton,
   StyledInput,
   StyledSelect,
+  ObjectsGrid,
 } from "@/components/StyledBits";
 
 const Tabs = styled.div`
@@ -206,7 +207,7 @@ const ObjectFields = ({
               <table>
                 <thead>
                   <tr>
-                    <th>ID</th>
+                    {/* <th>ID</th> */}
                     <th>Name</th>
                     <th>Field type</th>
                     <th>Options</th>
@@ -218,8 +219,8 @@ const ObjectFields = ({
                 <tbody>
                   {fields.map((field, index) => (
                     <tr key={field.id ?? `new-field-${index}`}>
-                      <td>{field.id ?? "Unsaved"}</td>
-                      <td>{field.name}</td>
+                      {/* <td>{field.id ?? "Unsaved"}</td> */}
+                      <td>{field.id ? field.name : "Unsaved changes"}</td>
                       <td>{field.fieldType}</td>
                       <td>{field.options.join(", ") || "-"}</td>
                       {/* <td>{objectId}</td> */}
@@ -240,83 +241,85 @@ const ObjectFields = ({
         >
           <form onSubmit={saveFields}>
             {fields.length === 0 && <p>No fields yet.</p>}
-            {fields.map((field, index) => (
-              <fieldset
-                style={{ maxWidth: "240px", marginTop: "12px" }}
-                key={field.id ?? `new-field-${index}`}
-              >
-                <legend>Field {index + 1}</legend>
-                <label>
-                  Name
-                  <StyledInput
-                    value={field.name}
-                    onChange={(event) =>
-                      updateField(index, { name: event.target.value })
-                    }
-                    required
-                  />
-                </label>
-                <label>
-                  Type
-                  <StyledSelect
-                    value={field.fieldType}
-                    onChange={(event) =>
-                      updateField(index, {
-                        fieldType: event.target.value as FieldType,
-                      })
-                    }
-                  >
-                    {FIELD_TYPES.map((fieldType) => (
-                      <option key={fieldType} value={fieldType}>
-                        {fieldType}
-                      </option>
-                    ))}
-                  </StyledSelect>
-                </label>
-                {["MULTISELECT", "SELECT"].includes(field.fieldType) && (
+            <ObjectsGrid>
+              {fields.map((field, index) => (
+                <fieldset
+                  style={{ maxWidth: "260px" }}
+                  key={field.id ?? `new-field-${index}`}
+                >
+                  <legend>Field {index + 1}</legend>
                   <label>
-                    Options (comma separated)
+                    Name
                     <StyledInput
-                      value={field.options.join(", ")}
+                      value={field.name}
                       onChange={(event) =>
-                        updateField(index, {
-                          options: event.target.value.split(","),
-                        })
+                        updateField(index, { name: event.target.value })
                       }
+                      required
                     />
                   </label>
-                )}
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={field.canEdit}
-                    onChange={(event) =>
-                      updateField(index, { canEdit: event.target.checked })
-                    }
-                  />
-                  Editable
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={field.visible}
-                    onChange={(event) =>
-                      updateField(index, { visible: event.target.checked })
-                    }
-                  />
-                  Visible
-                </label>
-                <StyledButton
-                  style={{ marginTop: "24px" }}
-                  type="button"
-                  $btnclr="red"
-                  onClick={() => removeField(index)}
-                  disabled={isSaving}
-                >
-                  Delete field
-                </StyledButton>
-              </fieldset>
-            ))}
+                  <label>
+                    Type
+                    <StyledSelect
+                      value={field.fieldType}
+                      onChange={(event) =>
+                        updateField(index, {
+                          fieldType: event.target.value as FieldType,
+                        })
+                      }
+                    >
+                      {FIELD_TYPES.map((fieldType) => (
+                        <option key={fieldType} value={fieldType}>
+                          {fieldType}
+                        </option>
+                      ))}
+                    </StyledSelect>
+                  </label>
+                  {["MULTISELECT", "SELECT"].includes(field?.fieldType) && (
+                    <label>
+                      Options (comma separated)
+                      <StyledInput
+                        value={field.options.join(", ")}
+                        onChange={(event) =>
+                          updateField(index, {
+                            options: event.target.value.split(","),
+                          })
+                        }
+                      />
+                    </label>
+                  )}
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={field.canEdit}
+                      onChange={(event) =>
+                        updateField(index, { canEdit: event.target.checked })
+                      }
+                    />
+                    Editable
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={field.visible}
+                      onChange={(event) =>
+                        updateField(index, { visible: event.target.checked })
+                      }
+                    />
+                    Visible
+                  </label>
+                  <StyledButton
+                    style={{ marginTop: "24px" }}
+                    type="button"
+                    $btnclr="red"
+                    onClick={() => removeField(index)}
+                    disabled={isSaving}
+                  >
+                    Delete field
+                  </StyledButton>
+                </fieldset>
+              ))}
+            </ObjectsGrid>
             <div style={{ display: "flex", gap: "24px", marginTop: "24px" }}>
               <StyledButton
                 type="button"
