@@ -18,6 +18,9 @@ export type Theme = {
   /** Darkest primary color. */
   PRIMARY_800: HexColor;
   /** Default foreground text color. */
+  DARK_COLOR_TEXT: HexColor;
+  /** Main application background color. */
+  /** Default foreground text color. */
   BLACK_TEXT_COLOR: HexColor;
   /** Main application background color. */
   BACKGROUND_COLOR: HexColor;
