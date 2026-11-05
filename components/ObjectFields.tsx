@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import styled from "styled-components";
 import { updateObjectFields } from "@/app/actions";
+import { theme } from "@/components/theme";
 import {
   ObjectBox,
   StyledButton,
@@ -28,6 +29,8 @@ const TabButton = styled.button<{ $active: boolean }>`
   padding: 8px 12px;
   font: inherit;
   cursor: pointer;
+  font-weight: bold;
+  color: ${theme.DARK_COLOR_TEXT};
 `;
 
 const TableWrap = styled.div`
@@ -180,7 +183,7 @@ const ObjectFields = ({
           $active={activeTab === "data"}
           onClick={() => setActiveTab("data")}
         >
-          Field data
+          View
         </TabButton>
         <TabButton
           id="field-editor-tab"
@@ -191,7 +194,7 @@ const ObjectFields = ({
           $active={activeTab === "edit"}
           onClick={() => setActiveTab("edit")}
         >
-          Update fields
+          Edit
         </TabButton>
       </Tabs>
       {activeTab === "data" ? (
@@ -209,7 +212,7 @@ const ObjectFields = ({
                   <tr>
                     {/* <th>ID</th> */}
                     <th>Name</th>
-                    <th>Field type</th>
+                    <th>Type</th>
                     <th>Options</th>
                     {/* <th>Object ID</th> */}
                     <th>Editable</th>
