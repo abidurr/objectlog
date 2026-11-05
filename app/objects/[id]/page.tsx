@@ -13,6 +13,7 @@ import {
   EditObject,
   ObjectFields,
 } from "@/components/";
+import { RecordForm } from "@/components/RecordForm";
 import Link from "next/link";
 import styled from "styled-components";
 import { theme } from "@/components/theme";
@@ -118,6 +119,13 @@ async function ObjectDetails({ id }: { id: string }) {
         />
       </ObjectsGrid>
       <ObjectFields objectId={object.id} fields={object.fields} />
+      <RecordForm
+        objectId={object.id}
+        fields={object.fields}
+        key={object.fields
+          .map((field) => `${field.id}:${field.fieldType}`)
+          .join("|")}
+      />
       {/* <h1>{object?.name}</h1>
       <dl>
         <dt>ID</dt>
