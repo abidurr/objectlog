@@ -11,6 +11,7 @@ type UserNavigationProps = {
 const userNavLinks = [
   { href: "/", label: "Home" },
   { href: "/objects", label: "Objects" },
+  { href: "/records", label: "Records" },
   { href: "/fields", label: "Fields" },
   { href: "/views", label: "Views" },
   { href: "/organizations", label: "Organizations" },
