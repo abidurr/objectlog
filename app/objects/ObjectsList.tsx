@@ -19,8 +19,10 @@ import moment from "moment-timezone";
 
 const ObjectsList = ({
   objects,
+  objectHrefBase = "/objects",
 }: {
   objects: Awaited<ReturnType<typeof getObjects>>;
+  objectHrefBase?: "/objects" | "/records";
 }) => {
   // const [isLoggedIn] = useAtom(isLoggedInAtom);
   // const [objects] = useState<Awaited<ReturnType<typeof getObjects>>>([]);
@@ -37,14 +39,15 @@ const ObjectsList = ({
     <StyledObjects>
       <h1>My Objects</h1>
       <p>
-        Below are the objects you made. You can click into one to update its
-        fields and add records for the object.
+        {objectHrefBase === "/records"
+          ? "Open an object to view, add, or edit its records."
+          : "Below are the objects you made. You can click into one to update its fields and add records for the object."}
       </p>
       &nbsp;
       <ObjectsGrid>
         {objects?.map((object) => (
           <div key={object.id}>
-            <Link href={`/objects/${object?.id}`}>
+            <Link href={`${objectHrefBase}/${object?.id}`}>
               <ObjectBox>
                 <IconAndTitle>
                   <LetterIcon
