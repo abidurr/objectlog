@@ -377,8 +377,150 @@ export async function createRecord({
   });
 
   revalidatePath(`/objects/${objectId}`);
+  revalidatePath(`/records/${objectId}`);
   revalidatePath("/fields");
   return record;
+}
+
+export async function getRecords(objectId: string, page = 1, pageSize = 10) {
+  if (!Number.isInteger(page) || page < 1) {
+    throw new Error("Invalid page");
+  }
+  if (!Number.isInteger(pageSize) || pageSize < 1 || pageSize > 100) {
+    throw new Error("Invalid page size");
+  }
+
+  const session = await auth0.getSession();
+  const email = session?.user?.email?.toLowerCase();
+
+  if (!email) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  const object = await prisma.object.findFirst({
+    where: { id: objectId, userId: user.id },
+    select: { id: true },
+  });
+  if (!object) {
+    throw new Error("Object not found");
+  }
+
+  const where = { objectId };
+  const [records, total] = await Promise.all([
+    prisma.record.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.record.count({ where }),
+  ]);
+
+  return {
+    records,
+    total,
+    page,
+    pageSize,
+    totalPages: Math.ceil(total / pageSize),
+  };
+}
+
+export async function updateRecord({
+  objectId,
+  recordId,
+  name,
+  values,
+}: {
+  objectId: string;
+  recordId: string;
+  name: string;
+  values: Record<string, RecordFieldInputValue>;
+}) {
+  const session = await auth0.getSession();
+  const email = session?.user?.email?.toLowerCase();
+
+  if (!email) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  const recordName = name.trim();
+  if (!recordName) {
+    throw new Error("A record name is required");
+  }
+
+  const object = await prisma.object.findFirst({
+    where: { id: objectId, userId: user.id },
+    include: { fields: true },
+  });
+  if (!object) {
+    throw new Error("Object not found");
+  }
+
+  const record = await prisma.record.findFirst({
+    where: { id: recordId, objectId },
+  });
+  if (!record) {
+    throw new Error("Record not found");
+  }
+
+  const editableFields = new Map(
+    object.fields
+      .filter((field) => field.visible && field.canEdit)
+      .map((field) => [field.id, field]),
+  );
+  const recordFields: Record<string, Prisma.InputJsonValue> =
+    record.fields &&
+    typeof record.fields === "object" &&
+    !Array.isArray(record.fields)
+      ? (record.fields as unknown as Record<string, Prisma.InputJsonValue>)
+      : {};
+
+  for (const [fieldId, input] of Object.entries(values)) {
+    const field = editableFields.get(fieldId);
+    if (!field) {
+      throw new Error("Invalid field ID");
+    }
+
+    const fieldType = field.fieldType as RecordFieldType;
+    const value = normalizeRecordFieldValue(fieldType, field.options, input);
+    const currentValue = recordFields[fieldId];
+    const currentField =
+      currentValue &&
+      typeof currentValue === "object" &&
+      !Array.isArray(currentValue)
+        ? (currentValue as Record<string, Prisma.InputJsonValue>)
+        : {};
+
+    recordFields[fieldId] = {
+      ...currentField,
+      field_id: field.id,
+      field_name: field.name,
+      field_type: fieldType,
+      [RECORD_VALUE_KEYS[fieldType]]: value,
+      computed_value: value,
+    };
+  }
+
+  const updatedRecord = await prisma.record.update({
+    where: { id: recordId },
+    data: { name: recordName, fields: recordFields },
+    select: { id: true },
+  });
+
+  revalidatePath(`/objects/${objectId}`);
+  revalidatePath(`/records/${objectId}`);
+  revalidatePath("/fields");
+  return updatedRecord;
 }
 
 export async function deleteObject(objectId: string) {
@@ -477,9 +619,21 @@ export async function getObjectsWithRecentRecords() {
 
 export async function getObject(objectId: string) {
   try {
-    const object = await prisma.object.findUnique({
+    const session = await auth0.getSession();
+    const email = session?.user?.email?.toLowerCase();
+    if (!email) {
+      return null;
+    }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return null;
+    }
+
+    const object = await prisma.object.findFirst({
       where: {
         id: objectId,
+        userId: user.id,
       },
       include: {
         fields: true,
