@@ -1,19 +1,33 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createRecord } from "@/app/actions";
+import { createRecord, importRecordsFromCsv } from "@/app/actions";
 import { RecordFieldInput } from "@/components/RecordFieldInput";
 import type {
   RecordFieldDefinition,
   RecordFieldValue,
 } from "@/components/RecordFieldInput";
 import { ObjectBox, StyledButton, StyledInput } from "@/components/StyledBits";
+import { parseCsv, stringifyCsv } from "@/lib/csv";
+import { FiDownload, FiUpload } from "react-icons/fi";
+import styled from "styled-components";
 
 type RecordFormProps = {
   objectId: string;
   fields: RecordFieldDefinition[];
 };
+
+const ImportActions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+
+  button {
+    margin-bottom: 0;
+  }
+`;
 
 const getInitialValues = (fields: RecordFieldDefinition[]) =>
   Object.fromEntries(
@@ -34,6 +48,88 @@ const RecordForm = ({ objectId, fields }: RecordFormProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [isImporting, setIsImporting] = useState(false);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const importableFields = fields.filter(
+    (field) => field.visible && field.canEdit,
+  );
+
+  const downloadCsv = (csv: string, filename: string) => {
+    const url = URL.createObjectURL(
+      new Blob([csv], { type: "text/csv;charset=utf-8" }),
+    );
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = filename;
+    anchor.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  const downloadSample = () => {
+    const headers = [
+      "Record name",
+      ...importableFields.map((field) => field.name),
+    ];
+    const exampleValues = importableFields.map((field) => {
+      switch (field.fieldType) {
+        case "TEXT":
+          return "Example text";
+        case "LONGTEXT":
+          return "Example long text";
+        case "DATE":
+          return "2026-01-15";
+        case "DATETIME":
+          return "2026-01-15T12:00";
+        case "SELECT":
+          return field.options[0] ?? "";
+        case "MULTISELECT":
+          return field.options.slice(0, 2).join(";");
+        case "ROUNDNUMBER":
+          return "1";
+      }
+    });
+    downloadCsv(
+      stringifyCsv([headers, ["Example record", ...exampleValues]]),
+      "record-sample.csv",
+    );
+  };
+
+  const importCsv = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file || isImporting) {
+      return;
+    }
+
+    setIsImporting(true);
+    setMessage("");
+    setError("");
+    try {
+      if (file.size > 400_000) {
+        throw new Error("CSV files must be smaller than 400 KB.");
+      }
+      const { headers, rows } = parseCsv(await file.text());
+      const result = await importRecordsFromCsv({ objectId, headers, rows });
+      if (!result.ok) {
+        downloadCsv(result.csv, "record-import-results.csv");
+        setError(result.message);
+        return;
+      }
+      setMessage(
+        `${result.importedCount} record${result.importedCount === 1 ? "" : "s"} imported.`,
+      );
+      router.refresh();
+    } catch (caughtError) {
+      console.error("Could not import records:", caughtError);
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Could not import records. Please try again.",
+      );
+    } finally {
+      setIsImporting(false);
+    }
+  };
 
   const updateValue = (fieldId: string, value: RecordFieldValue) => {
     setValues((currentValues) => ({ ...currentValues, [fieldId]: value }));
@@ -92,9 +188,31 @@ const RecordForm = ({ objectId, fields }: RecordFormProps) => {
         <StyledButton type="submit" $btnclr="green" disabled={isSaving}>
           {isSaving ? "Saving..." : "Save record"}
         </StyledButton>
-        {message && <p role="status">{message}</p>}
-        {error && <p role="alert">{error}</p>}
       </form>
+      <ImportActions aria-label="Import records">
+        <StyledButton type="button" onClick={downloadSample}>
+          <FiDownload aria-hidden="true" />
+          Download sample CSV
+        </StyledButton>
+        <StyledButton
+          type="button"
+          $btnclr="green"
+          disabled={isImporting}
+          onClick={() => fileInput.current?.click()}
+        >
+          <FiUpload aria-hidden="true" />
+          {isImporting ? "Validating CSV..." : "Upload CSV"}
+        </StyledButton>
+        <input
+          ref={fileInput}
+          type="file"
+          accept=".csv,text/csv"
+          onChange={importCsv}
+          hidden
+        />
+      </ImportActions>
+      {message && <p role="status">{message}</p>}
+      {error && <p role="alert">{error}</p>}
     </ObjectBox>
   );
 };

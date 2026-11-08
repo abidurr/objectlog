@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { auth0 } from "@/lib/auth0";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
+import { stringifyCsv } from "@/lib/csv";
 
 // READ actions
 export async function getUsers() {
@@ -393,6 +394,294 @@ function normalizeRecordFieldValue(
       return input;
     }
   }
+}
+
+const MAX_IMPORTED_RECORDS = 100;
+const IMPORT_STATUS_HEADER = "Import status";
+
+function sanitizeCsvValue(value: string) {
+  return value
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "")
+    .trim();
+}
+
+function isValidDate(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false;
+  }
+  const date = new Date(`${value}T00:00:00.000Z`);
+  return (
+    !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value
+  );
+}
+
+function validateImportedField(
+  field: { fieldType: RecordFieldType; options: string[] },
+  rawValue: string,
+): { value: RecordFieldInputValue; error?: string } {
+  const value = sanitizeCsvValue(rawValue);
+
+  switch (field.fieldType) {
+    case "TEXT":
+    case "LONGTEXT":
+      return { value };
+    case "DATE":
+      return !value || isValidDate(value)
+        ? { value }
+        : { value, error: "must be a valid YYYY-MM-DD date" };
+    case "DATETIME": {
+      if (!value) {
+        return { value };
+      }
+      const datePart = value.slice(0, 10);
+      const isDateTime =
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?(?:Z|[+-]\d{2}:\d{2})?$/.test(
+          value,
+        ) && isValidDate(datePart);
+      return isDateTime && !Number.isNaN(Date.parse(value))
+        ? { value }
+        : { value, error: "must be a valid ISO date and time" };
+    }
+    case "SELECT":
+      return !value || field.options.includes(value)
+        ? { value }
+        : { value, error: `must match an option: ${field.options.join(", ")}` };
+    case "MULTISELECT": {
+      const values = value ? value.split(";").map(sanitizeCsvValue) : [];
+      const invalidOption = values.find(
+        (option) => !option || !field.options.includes(option),
+      );
+      return invalidOption
+        ? {
+            value: values,
+            error: `contains an invalid option: ${invalidOption}`,
+          }
+        : { value: values };
+    }
+    case "ROUNDNUMBER": {
+      if (!value) {
+        return { value: null };
+      }
+      const number = Number(value);
+      return Number.isFinite(number)
+        ? { value: number }
+        : { value, error: "must be a finite number" };
+    }
+  }
+}
+
+function buildImportStatusCsv(
+  headers: string[],
+  rows: string[][],
+  statuses: string[],
+) {
+  const statusIndexes = new Set(
+    headers.flatMap((header, index) =>
+      header.trim().toLowerCase() === IMPORT_STATUS_HEADER.toLowerCase()
+        ? [index]
+        : [],
+    ),
+  );
+  const cleanHeaders = headers.filter((_, index) => !statusIndexes.has(index));
+  const cleanRows = rows.map((row) =>
+    row.filter((_, index) => !statusIndexes.has(index)),
+  );
+
+  return stringifyCsv([
+    [...cleanHeaders, IMPORT_STATUS_HEADER],
+    ...cleanRows.map((row, index) => [
+      ...row,
+      statuses[index] ?? "ERROR: row could not be validated",
+    ]),
+  ]);
+}
+
+export async function importRecordsFromCsv({
+  objectId,
+  headers,
+  rows,
+}: {
+  objectId: string;
+  headers: string[];
+  rows: string[][];
+}): Promise<
+  | { ok: true; importedCount: number }
+  | { ok: false; invalidFieldCount: number; message: string; csv: string }
+> {
+  const session = await auth0.getSession();
+  const email = session?.user?.email?.toLowerCase();
+  if (!email) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  if (
+    !Array.isArray(headers) ||
+    !Array.isArray(rows) ||
+    headers.length === 0 ||
+    headers.length > 250 ||
+    !headers.every((header) => typeof header === "string") ||
+    rows.length === 0 ||
+    rows.some(
+      (row) =>
+        !Array.isArray(row) ||
+        row.length > headers.length ||
+        row.some((value) => typeof value !== "string"),
+    )
+  ) {
+    throw new Error("Invalid CSV data");
+  }
+
+  const object = await prisma.object.findFirst({
+    where: { id: objectId, userId: user.id },
+    include: { fields: true },
+  });
+  if (!object) {
+    throw new Error("Object not found");
+  }
+
+  const importableFields = object.fields.filter(
+    (field) => field.visible && field.canEdit,
+  );
+  const statusIndexes = new Set(
+    headers.flatMap((header, index) =>
+      header.trim().toLowerCase() === IMPORT_STATUS_HEADER.toLowerCase()
+        ? [index]
+        : [],
+    ),
+  );
+  const indexesByHeader = new Map<string, number[]>();
+  headers.forEach((header, index) => {
+    if (statusIndexes.has(index)) {
+      return;
+    }
+    const normalized = header.trim().toLowerCase();
+    indexesByHeader.set(normalized, [
+      ...(indexesByHeader.get(normalized) ?? []),
+      index,
+    ]);
+  });
+
+  const expectedHeaders = [
+    "record name",
+    ...importableFields.map((field) => field.name.trim().toLowerCase()),
+  ];
+  const missingHeaders = expectedHeaders.filter(
+    (header) => !indexesByHeader.has(header),
+  );
+  const duplicateHeaders = [...indexesByHeader.entries()]
+    .filter(([, indexes]) => indexes.length > 1)
+    .map(([header]) => header);
+  const unknownHeaders = [...indexesByHeader.keys()].filter(
+    (header) => !expectedHeaders.includes(header),
+  );
+
+  if (rows.length > MAX_IMPORTED_RECORDS) {
+    const statuses = rows.map(() => "ERROR: maximum of 100 records per upload");
+    return {
+      ok: false,
+      invalidFieldCount: 0,
+      message: `This CSV contains ${rows.length} records; the maximum is ${MAX_IMPORTED_RECORDS}.`,
+      csv: buildImportStatusCsv(headers, rows, statuses),
+    };
+  }
+
+  const normalizedRows: {
+    name: string;
+    objectId: string;
+    fields: Prisma.InputJsonValue;
+  }[] = [];
+  const rowErrors: string[][] = [];
+
+  for (const row of rows) {
+    const errors: string[] = [];
+    if (row.length !== headers.length) {
+      errors.push("row has a different number of columns than the header");
+    }
+    for (const header of missingHeaders) {
+      errors.push(`missing required column: ${header}`);
+    }
+    for (const header of duplicateHeaders) {
+      errors.push(`duplicate column: ${header}`);
+    }
+    for (const header of unknownHeaders) {
+      errors.push(`unknown column: ${header}`);
+    }
+
+    const nameIndex = indexesByHeader.get("record name")?.[0];
+    const recordName =
+      nameIndex === undefined ? "" : sanitizeCsvValue(row[nameIndex] ?? "");
+    if (!recordName) {
+      errors.push("record name is required");
+    }
+
+    const recordFields: Record<string, Prisma.InputJsonValue> = {};
+    for (const field of object.fields) {
+      const fieldType = field.fieldType as RecordFieldType;
+      const index = indexesByHeader.get(field.name.trim().toLowerCase())?.[0];
+      const result =
+        field.visible && field.canEdit
+          ? validateImportedField(
+              { fieldType, options: field.options },
+              index === undefined ? "" : (row[index] ?? ""),
+            )
+          : {
+              value: normalizeRecordFieldValue(
+                fieldType,
+                field.options,
+                undefined,
+              ),
+            };
+      if (result.error) {
+        errors.push(`${field.name}: ${result.error}`);
+      }
+      recordFields[field.id] = {
+        field_id: field.id,
+        field_name: field.name,
+        field_type: fieldType,
+        [RECORD_VALUE_KEYS[fieldType]]: result.value,
+        computed_value: result.value,
+      } as Prisma.InputJsonValue;
+    }
+
+    rowErrors.push(errors);
+    if (errors.length === 0) {
+      normalizedRows.push({
+        name: recordName,
+        objectId,
+        fields: recordFields,
+      });
+    }
+  }
+
+  const invalidFieldCount = rowErrors.reduce(
+    (total, errors) => total + errors.length,
+    0,
+  );
+  if (invalidFieldCount > 0) {
+    const statuses = rowErrors.map((errors) =>
+      errors.length === 0 ? "OK" : `ERROR: ${errors.join("; ")}`,
+    );
+    return {
+      ok: false,
+      invalidFieldCount,
+      message: `${invalidFieldCount} field value${invalidFieldCount === 1 ? " was" : "s were"} missing or incorrect. No records were imported.`,
+      csv: buildImportStatusCsv(headers, rows, statuses),
+    };
+  }
+
+  if (normalizedRows.length > 0) {
+    await prisma.record.createMany({ data: normalizedRows });
+    revalidatePath(`/objects/${objectId}`);
+    revalidatePath(`/records/${objectId}`);
+    revalidatePath("/fields");
+  }
+
+  return { ok: true, importedCount: normalizedRows.length };
 }
 
 export async function createRecord({
