@@ -28,31 +28,112 @@ type CreateObjectInput = {
   color?: string;
 };
 
+async function getOrCreateAuthenticatedUser() {
+  const session = await auth0.getSession();
+  const email = session?.user?.email?.toLowerCase();
+  const auth0id = session?.user?.sub;
+
+  if (!email || !auth0id) {
+    return null;
+  }
+
+  const userByAuth0Id = await prisma.user.findFirst({ where: { auth0id } });
+  if (userByAuth0Id) {
+    return userByAuth0Id;
+  }
+
+  const userByEmail = await prisma.user.findUnique({ where: { email } });
+  if (userByEmail) {
+    if (userByEmail.auth0id && userByEmail.auth0id !== auth0id) {
+      return null;
+    }
+    return prisma.user.update({
+      where: { id: userByEmail.id },
+      data: { auth0id },
+    });
+  }
+
+  return prisma.user.create({
+    data: {
+      email,
+      username: email,
+      name: session.user.name ?? "Imported User",
+      auth0id,
+    },
+  });
+}
+
+export async function getCurrentUserProfile() {
+  const user = await getOrCreateAuthenticatedUser();
+  if (!user) {
+    return null;
+  }
+
+  return {
+    id: user.id,
+    username: user.username,
+    name: user.name,
+  };
+}
+
+export async function updateCurrentUserProfile({
+  username,
+  name,
+}: {
+  username: string;
+  name: string;
+}) {
+  const user = await getOrCreateAuthenticatedUser();
+  if (!user) {
+    return {
+      ok: false as const,
+      error: "You must be logged in to edit your profile.",
+    };
+  }
+
+  const normalizedUsername = username.trim().toLowerCase();
+  if (!normalizedUsername) {
+    return { ok: false as const, error: "Username is required." };
+  }
+
+  const existingUser = await prisma.user.findFirst({
+    where: {
+      username: { equals: normalizedUsername, mode: "insensitive" },
+      id: { not: user.id },
+    },
+    select: { id: true },
+  });
+  if (existingUser) {
+    return { ok: false as const, error: "That username is already taken." };
+  }
+
+  const updatedUser = await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      username: normalizedUsername,
+      name: name.trim() || null,
+    },
+  });
+
+  revalidatePath("/profile");
+  return {
+    ok: true as const,
+    profile: {
+      username: updatedUser.username ?? "",
+      name: updatedUser.name ?? "",
+    },
+  };
+}
+
 export async function createObject({
   input = {},
 }: {
   input: CreateObjectInput;
 }) {
   try {
-    const session = await auth0.getSession();
-    const email = session?.user?.email?.toLowerCase();
-
-    if (!email) {
-      throw new Error("Unauthorized");
-    }
-
-    let user = await prisma.user.findUnique({
-      where: { email },
-    });
-
+    const user = await getOrCreateAuthenticatedUser();
     if (!user) {
-      user = await prisma.user.create({
-        data: {
-          email,
-          username: email,
-          name: session?.user?.name ?? "Imported User",
-        },
-      });
+      throw new Error("Unauthorized");
     }
 
     const object = await prisma.object.create({

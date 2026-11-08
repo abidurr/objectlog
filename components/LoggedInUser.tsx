@@ -5,6 +5,8 @@ import { ObjectBox, StyledButton } from "@/components/StyledBits";
 import Link from "next/link";
 import moment from "moment-timezone";
 import { theme } from "@/components/theme";
+import { getCurrentUserProfile } from "@/app/actions";
+import { EditProfile } from "@/components/EditProfile";
 
 const LoggedInUser = async () => {
   const session = await auth0.getSession();
@@ -25,6 +27,8 @@ const LoggedInUser = async () => {
       </>
     );
   }
+
+  const databaseUser = await getCurrentUserProfile();
 
   // "user": {
   //   "nickname": "abidur",
@@ -59,8 +63,16 @@ const LoggedInUser = async () => {
           <p>{session.user.nickname}</p>
         </FlexDiv>
         <FlexDiv>
+          <h3 style={{ fontFamily: "monospace" }}>Username</h3>
+          <p>{databaseUser?.username ?? "-"}</p>
+        </FlexDiv>
+        <FlexDiv>
           <h3 style={{ fontFamily: "monospace" }}>Name</h3>
-          <p>{session.user.name}</p>
+          <p>
+            {databaseUser
+              ? (databaseUser.name ?? "-")
+              : (session.user.name ?? "-")}
+          </p>
         </FlexDiv>
         <FlexDiv>
           <h3 style={{ fontFamily: "monospace" }}>Email</h3>
@@ -87,6 +99,13 @@ const LoggedInUser = async () => {
           <p>{moment.unix(session?.tokenSet?.expiresAt).format("LLL")}</p>
         </FlexDiv>
       </ObjectBox>
+      {databaseUser && (
+        <EditProfile
+          key={databaseUser.id}
+          username={databaseUser.username ?? ""}
+          name={databaseUser.name ?? ""}
+        />
+      )}
       {/* <h3>Picture</h3> */}
 
       <FlexDiv style={{ marginTop: "24px", marginBottom: "16px" }}>
