@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import styled from "styled-components";
 import { updateRecord } from "@/app/actions";
 import type { getRecords } from "@/app/actions";
+import { FiArrowDown, FiArrowUp } from "react-icons/fi";
 import { RecordFieldInput } from "@/components/RecordFieldInput";
 import type {
   RecordFieldDefinition,
@@ -14,6 +15,7 @@ import type {
 import { StyledButton, StyledInput } from "@/components/StyledBits";
 
 type RecordItem = Awaited<ReturnType<typeof getRecords>>["records"][number];
+type SortColumn = "name" | `field:${string}`;
 
 const VALUE_KEYS: Record<RecordFieldType, string> = {
   TEXT: "text_value",
@@ -28,23 +30,86 @@ const VALUE_KEYS: Record<RecordFieldType, string> = {
 const TableWrap = styled.div`
   max-width: 100%;
   overflow-x: auto;
+  border: 1px solid #d8ded8;
+  border-radius: 6px;
+  background: #fff;
 
   table {
     width: 100%;
-    min-width: 520px;
-    border-collapse: collapse;
+    min-width: 560px;
+    border-collapse: separate;
+    border-spacing: 0;
     text-align: left;
   }
 
   th,
   td {
-    padding: 8px 12px;
-    border-bottom: 1px solid #ccc;
+    padding: 11px 14px;
+    border-bottom: 1px solid #e6eae6;
     vertical-align: top;
+    color: #152a22;
   }
 
   th {
+    background: #f3f6f2;
+    color: #3d4b40;
+    font-size: 0.82rem;
+    font-weight: 650;
     white-space: nowrap;
+  }
+
+  th:has(button) {
+    padding: 0;
+  }
+
+  th:first-child {
+    border-top-left-radius: 5px;
+  }
+
+  th:last-child {
+    border-top-right-radius: 5px;
+  }
+
+  th button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 42px;
+    box-sizing: border-box;
+    padding: 11px 14px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  th button:hover {
+    color: #17653f;
+  }
+
+  th button:focus-visible {
+    outline: 2px solid #17653f;
+    outline-offset: 3px;
+  }
+
+  th button svg {
+    flex: none;
+    color: #657369;
+  }
+
+  tbody tr:nth-child(even) {
+    background: #fafbf9;
+  }
+
+  tbody tr:hover {
+    background: #eff5ef;
+  }
+
+  tbody tr:last-child > * {
+    border-bottom: 0;
   }
 `;
 
@@ -131,6 +196,8 @@ const RecordsTable = ({
 }) => {
   const router = useRouter();
   const visibleFields = fields.filter((field) => field.visible);
+  const [sortColumn, setSortColumn] = useState<SortColumn | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [editingRecord, setEditingRecord] = useState<RecordItem | null>(null);
   const [name, setName] = useState("");
   const [values, setValues] = useState<Record<string, RecordFieldValue>>({});
@@ -182,6 +249,73 @@ const RecordsTable = ({
     setError("");
   };
 
+  const getSortValue = (record: RecordItem, column: SortColumn) => {
+    if (column === "name") {
+      return record.name;
+    }
+
+    const fieldId = column.slice("field:".length);
+    const field = visibleFields.find(
+      (visibleField) => visibleField.id === fieldId,
+    );
+    const value = field
+      ? getRecordFieldData(record)[field.id]?.[VALUE_KEYS[field.fieldType]]
+      : undefined;
+    return typeof value === "number" ? value : formatValue(value);
+  };
+
+  const sortedRecords = sortColumn
+    ? [...records].sort((first, second) => {
+        const firstValue = getSortValue(first, sortColumn);
+        const secondValue = getSortValue(second, sortColumn);
+        const comparison =
+          typeof firstValue === "number" && typeof secondValue === "number"
+            ? firstValue - secondValue
+            : String(firstValue).localeCompare(String(secondValue), undefined, {
+                numeric: true,
+                sensitivity: "base",
+              });
+        return sortDirection === "asc" ? comparison : -comparison;
+      })
+    : records;
+
+  const renderHeader = (column: SortColumn, label: string) => {
+    const isActive = sortColumn === column;
+    const nextDirection = isActive && sortDirection === "asc" ? "desc" : "asc";
+    const SortIcon =
+      isActive && sortDirection === "asc" ? FiArrowUp : FiArrowDown;
+
+    return (
+      <th
+        key={column}
+        scope="col"
+        aria-sort={
+          isActive
+            ? sortDirection === "asc"
+              ? "ascending"
+              : "descending"
+            : "none"
+        }
+      >
+        <button
+          type="button"
+          onClick={() => {
+            if (isActive) {
+              setSortDirection(nextDirection);
+            } else {
+              setSortColumn(column);
+              setSortDirection("asc");
+            }
+          }}
+          aria-label={`Sort by ${label} ${nextDirection === "asc" ? "ascending" : "descending"}`}
+        >
+          {label}
+          <SortIcon aria-hidden="true" size={14} />
+        </button>
+      </th>
+    );
+  };
+
   return (
     <>
       {message && <p role="status">{message}</p>}
@@ -189,11 +323,11 @@ const RecordsTable = ({
         <table>
           <thead>
             <tr>
-              <th>Name</th>
-              {visibleFields.map((field) => (
-                <th key={field.id}>{field.name}</th>
-              ))}
-              <th>Actions</th>
+              {renderHeader("name", "Name")}
+              {visibleFields.map((field) =>
+                renderHeader(`field:${field.id}`, field.name),
+              )}
+              <th scope="col">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -202,7 +336,7 @@ const RecordsTable = ({
                 <td colSpan={visibleFields.length + 2}>No records yet.</td>
               </tr>
             ) : (
-              records.map((record) => (
+              sortedRecords.map((record) => (
                 <Fragment key={record.id}>
                   <tr>
                     <td>{record.name}</td>
