@@ -828,69 +828,163 @@ export async function updateRecord({
     throw new Error("A record name is required");
   }
 
-  const object = await prisma.object.findFirst({
-    where: { id: objectId, userId: user.id },
-    include: { fields: true },
-  });
-  if (!object) {
-    throw new Error("Object not found");
-  }
-
-  const record = await prisma.record.findFirst({
-    where: { id: recordId, objectId },
-  });
-  if (!record) {
-    throw new Error("Record not found");
-  }
-
-  const editableFields = new Map(
-    object.fields
-      .filter((field) => field.visible && field.canEdit)
-      .map((field) => [field.id, field]),
-  );
-  const recordFields: Record<string, Prisma.InputJsonValue> =
-    record.fields &&
-    typeof record.fields === "object" &&
-    !Array.isArray(record.fields)
-      ? (record.fields as unknown as Record<string, Prisma.InputJsonValue>)
-      : {};
-
-  for (const [fieldId, input] of Object.entries(values)) {
-    const field = editableFields.get(fieldId);
-    if (!field) {
-      throw new Error("Invalid field ID");
+  const updatedRecord = await prisma.$transaction(async (transaction) => {
+    const object = await transaction.object.findFirst({
+      where: { id: objectId, userId: user.id },
+      include: { fields: true },
+    });
+    if (!object) {
+      throw new Error("Object not found");
     }
 
-    const fieldType = field.fieldType as RecordFieldType;
-    const value = normalizeRecordFieldValue(fieldType, field.options, input);
-    const currentValue = recordFields[fieldId];
-    const currentField =
-      currentValue &&
-      typeof currentValue === "object" &&
-      !Array.isArray(currentValue)
-        ? (currentValue as Record<string, Prisma.InputJsonValue>)
+    const record = await transaction.record.findFirst({
+      where: { id: recordId, objectId },
+    });
+    if (!record) {
+      throw new Error("Record not found");
+    }
+
+    const editableFields = new Map(
+      object.fields
+        .filter((field) => field.visible && field.canEdit)
+        .map((field) => [field.id, field]),
+    );
+    const recordFields: Record<string, Prisma.InputJsonValue> =
+      record.fields &&
+      typeof record.fields === "object" &&
+      !Array.isArray(record.fields)
+        ? (record.fields as unknown as Record<string, Prisma.InputJsonValue>)
         : {};
+    const changeLogs: {
+      objectId: string;
+      recordId: string;
+      fieldName: string;
+      oldValue: string | null;
+      newValue: string | null;
+    }[] = [];
 
-    recordFields[fieldId] = {
-      ...currentField,
-      field_id: field.id,
-      field_name: field.name,
-      field_type: fieldType,
-      [RECORD_VALUE_KEYS[fieldType]]: value,
-      computed_value: value,
-    };
-  }
+    if (record.name !== recordName) {
+      changeLogs.push({
+        objectId,
+        recordId,
+        fieldName: "Name",
+        oldValue: JSON.stringify(record.name),
+        newValue: JSON.stringify(recordName),
+      });
+    }
 
-  const updatedRecord = await prisma.record.update({
-    where: { id: recordId },
-    data: { name: recordName, fields: recordFields },
-    select: { id: true },
+    for (const [fieldId, input] of Object.entries(values)) {
+      const field = editableFields.get(fieldId);
+      if (!field) {
+        throw new Error("Invalid field ID");
+      }
+
+      const fieldType = field.fieldType as RecordFieldType;
+      const value = normalizeRecordFieldValue(fieldType, field.options, input);
+      const currentValue = recordFields[fieldId];
+      const currentField =
+        currentValue &&
+        typeof currentValue === "object" &&
+        !Array.isArray(currentValue)
+          ? (currentValue as Record<string, Prisma.InputJsonValue>)
+          : {};
+      const valueKey = RECORD_VALUE_KEYS[fieldType];
+      const storedValue =
+        currentField[valueKey] === undefined
+          ? currentField.computed_value
+          : currentField[valueKey];
+      const oldValue =
+        storedValue === undefined
+          ? fieldType === "MULTISELECT"
+            ? []
+            : fieldType === "ROUNDNUMBER"
+              ? null
+              : ""
+          : storedValue;
+
+      if (JSON.stringify(oldValue) !== JSON.stringify(value)) {
+        changeLogs.push({
+          objectId,
+          recordId,
+          fieldName: field.name,
+          oldValue: JSON.stringify(oldValue) ?? null,
+          newValue: JSON.stringify(value) ?? null,
+        });
+      }
+
+      recordFields[fieldId] = {
+        ...currentField,
+        field_id: field.id,
+        field_name: field.name,
+        field_type: fieldType,
+        [valueKey]: value,
+        computed_value: value,
+      };
+    }
+
+    if (changeLogs.length > 0) {
+      await transaction.changeLog.createMany({ data: changeLogs });
+    }
+
+    return transaction.record.update({
+      where: { id: recordId },
+      data: { name: recordName, fields: recordFields },
+      select: { id: true },
+    });
   });
 
   revalidatePath(`/objects/${objectId}`);
   revalidatePath(`/records/${objectId}`);
+  revalidatePath(`/logs/${recordId}`);
   revalidatePath("/fields");
   return updatedRecord;
+}
+
+export async function getRecordChangeLogs(recordId: string) {
+  const session = await auth0.getSession();
+  const email = session?.user?.email?.toLowerCase();
+
+  if (!email || !/^[\da-f]{24}$/i.test(recordId)) {
+    return null;
+  }
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) {
+    return null;
+  }
+
+  const record = await prisma.record.findFirst({
+    where: { id: recordId },
+  });
+  if (!record) {
+    return null;
+  }
+
+  const object = await prisma.object.findFirst({
+    where: { id: record.objectId, userId: user.id },
+    include: { fields: true },
+  });
+  if (!object) {
+    return null;
+  }
+
+  const recordWithChangeLogs = await prisma.record.findFirst({
+    where: { id: recordId, objectId: object.id },
+    include: {
+      changeLogs: {
+        orderBy: { createdAt: "desc" },
+      },
+    },
+  });
+  if (!recordWithChangeLogs) {
+    return null;
+  }
+
+  return {
+    record: recordWithChangeLogs,
+    object,
+    changeLogs: recordWithChangeLogs.changeLogs,
+  };
 }
 
 export async function deleteObject(objectId: string) {
@@ -922,7 +1016,7 @@ export async function deleteObject(objectId: string) {
       throw new Error("Object not found");
     }
 
-    // await transaction.changeLog.deleteMany({ where: { objectId } });
+    await transaction.changeLog.deleteMany({ where: { objectId } });
     await transaction.record.deleteMany({ where: { objectId } });
     await transaction.field.deleteMany({ where: { objectId } });
     await transaction.object.delete({

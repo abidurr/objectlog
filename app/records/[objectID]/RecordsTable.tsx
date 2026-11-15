@@ -2,6 +2,7 @@
 
 import { Fragment, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import styled from "styled-components";
 import { updateRecord } from "@/app/actions";
 import type { getRecords } from "@/app/actions";
@@ -110,6 +111,33 @@ const TableWrap = styled.div`
 
   tbody tr:last-child > * {
     border-bottom: 0;
+  }
+
+  .row-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .row-actions button {
+    margin-bottom: 0;
+  }
+
+  .logs-button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    box-sizing: border-box;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: #e5eefc;
+    color: #152a22;
+    font-weight: 650;
+    text-decoration: none;
+  }
+
+  .logs-button:hover {
+    background: #d3e2f8;
   }
 `;
 
@@ -350,13 +378,18 @@ const RecordsTable = ({
                       </td>
                     ))}
                     <td>
-                      <StyledButton
-                        type="button"
-                        $btnclr="blue"
-                        onClick={() => startEditing(record)}
-                      >
-                        Edit
-                      </StyledButton>
+                      <div className="row-actions">
+                        <StyledButton
+                          type="button"
+                          $btnclr="blue"
+                          onClick={() => startEditing(record)}
+                        >
+                          Edit
+                        </StyledButton>
+                        <Link className="logs-button" href={`/logs/${record.id}`}>
+                          Logs
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                   {editingRecord?.id === record.id && (
