@@ -3,7 +3,7 @@
 import { Fragment, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { updateRecord } from "@/app/actions";
 import type { getRecords } from "@/app/actions";
 import { FiArrowDown, FiArrowUp } from "react-icons/fi";
@@ -13,7 +13,12 @@ import type {
   RecordFieldValue,
   RecordFieldType,
 } from "@/components/RecordFieldInput";
-import { StyledButton, StyledInput } from "@/components/StyledBits";
+import {
+  ObjectTable,
+  ObjectTableContainer,
+  StyledInput,
+} from "@/components/StyledBits";
+import { theme } from "@/components/theme";
 
 type RecordItem = Awaited<ReturnType<typeof getRecords>>["records"][number];
 type SortColumn = "name" | `field:${string}`;
@@ -28,117 +33,70 @@ const VALUE_KEYS: Record<RecordFieldType, string> = {
   ROUNDNUMBER: "roundnumber_value",
 };
 
-const TableWrap = styled.div`
-  max-width: 100%;
-  overflow-x: auto;
-  border: 1px solid #d8ded8;
+const compactActionStyles = css<{
+  $variant?: "blue" | "green" | "neutral";
+}>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  box-sizing: border-box;
+  padding: 5px 9px;
+  border: 1px solid ${theme.PRIMARY_400};
   border-radius: 6px;
-  background: #fff;
+  background-color: ${({ $variant }) =>
+    $variant === "green"
+      ? theme.TRANSLUCENT.GREEN1
+      : $variant === "neutral"
+        ? theme.PRIMARY_300
+        : theme.PRIMARY_400};
+  color: ${theme.BLACK_TEXT_COLOR};
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 650;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 
-  table {
-    width: 100%;
-    min-width: 560px;
-    border-collapse: separate;
-    border-spacing: 0;
-    text-align: left;
+  &:hover {
+    background-color: ${({ $variant }) =>
+      $variant === "green"
+        ? theme.TRANSLUCENT.GREEN2
+        : $variant === "neutral"
+          ? theme.PRIMARY_400
+          : theme.PRIMARY_500};
   }
 
-  th,
-  td {
-    padding: 11px 14px;
-    border-bottom: 1px solid #e6eae6;
-    vertical-align: top;
-    color: #152a22;
+  &:focus-visible {
+    outline: 2px solid ${theme.DARK_COLOR_TEXT};
+    outline-offset: 2px;
   }
 
-  th {
-    background: #f3f6f2;
-    color: #3d4b40;
-    font-size: 0.82rem;
-    font-weight: 650;
-    white-space: nowrap;
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
   }
+`;
 
-  th:has(button) {
-    padding: 0;
-  }
+const CompactButton = styled.button<{
+  $variant?: "blue" | "green" | "neutral";
+}>`
+  ${compactActionStyles}
+`;
 
-  th:first-child {
-    border-top-left-radius: 5px;
-  }
+const CompactLink = styled(Link)<{
+  $variant?: "blue" | "green" | "neutral";
+}>`
+  ${compactActionStyles}
+  text-decoration: none;
+`;
 
-  th:last-child {
-    border-top-right-radius: 5px;
-  }
-
-  th button {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    min-height: 42px;
-    box-sizing: border-box;
-    padding: 11px 14px;
-    border: 0;
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    text-align: left;
-    cursor: pointer;
-  }
-
-  th button:hover {
-    color: #17653f;
-  }
-
-  th button:focus-visible {
-    outline: 2px solid #17653f;
-    outline-offset: 3px;
-  }
-
-  th button svg {
-    flex: none;
-    color: #657369;
-  }
-
-  tbody tr:nth-child(even) {
-    background: #fafbf9;
-  }
-
-  tbody tr:hover {
-    background: #eff5ef;
-  }
-
-  tbody tr:last-child > * {
-    border-bottom: 0;
-  }
-
-  .row-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .row-actions button {
-    margin-bottom: 0;
-  }
-
-  .logs-button {
-    display: inline-flex;
-    align-items: center;
-    min-height: 36px;
-    box-sizing: border-box;
-    padding: 8px 16px;
-    border-radius: 8px;
-    background: #e5eefc;
-    color: #152a22;
-    font-weight: 650;
-    text-decoration: none;
-  }
-
-  .logs-button:hover {
-    background: #d3e2f8;
-  }
+const RowActions = styled.div`
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
 `;
 
 const EditForm = styled.form`
@@ -307,7 +265,11 @@ const RecordsTable = ({
       })
     : records;
 
-  const renderHeader = (column: SortColumn, label: string) => {
+  const renderHeader = (
+    column: SortColumn,
+    label: string,
+    isNumeric = false,
+  ) => {
     const isActive = sortColumn === column;
     const nextDirection = isActive && sortDirection === "asc" ? "desc" : "asc";
     const SortIcon =
@@ -316,6 +278,7 @@ const RecordsTable = ({
     return (
       <th
         key={column}
+        className={isNumeric ? "numeric-column" : undefined}
         scope="col"
         aria-sort={
           isActive
@@ -347,13 +310,17 @@ const RecordsTable = ({
   return (
     <>
       {message && <p role="status">{message}</p>}
-      <TableWrap>
-        <table>
+      <ObjectTableContainer>
+        <ObjectTable>
           <thead>
             <tr>
               {renderHeader("name", "Name")}
               {visibleFields.map((field) =>
-                renderHeader(`field:${field.id}`, field.name),
+                renderHeader(
+                  `field:${field.id}`,
+                  field.name,
+                  field.fieldType === "ROUNDNUMBER",
+                ),
               )}
               <th scope="col">Actions</th>
             </tr>
@@ -364,12 +331,25 @@ const RecordsTable = ({
                 <td colSpan={visibleFields.length + 2}>No records yet.</td>
               </tr>
             ) : (
-              sortedRecords.map((record) => (
+              sortedRecords.map((record, index) => (
                 <Fragment key={record.id}>
-                  <tr>
-                    <td>{record.name}</td>
+                  <tr
+                    className={
+                      index === sortedRecords.length - 1
+                        ? "last-record-row"
+                        : undefined
+                    }
+                  >
+                    <td className="record-name-cell">{record.name}</td>
                     {visibleFields.map((field) => (
-                      <td key={field.id}>
+                      <td
+                        key={field.id}
+                        className={
+                          field.fieldType === "ROUNDNUMBER"
+                            ? "numeric-column"
+                            : undefined
+                        }
+                      >
                         {formatValue(
                           getRecordFieldData(record)[field.id]?.[
                             VALUE_KEYS[field.fieldType]
@@ -378,18 +358,17 @@ const RecordsTable = ({
                       </td>
                     ))}
                     <td>
-                      <div className="row-actions">
-                        <StyledButton
+                      <RowActions>
+                        <CompactButton
                           type="button"
-                          $btnclr="blue"
                           onClick={() => startEditing(record)}
                         >
                           Edit
-                        </StyledButton>
-                        <Link className="logs-button" href={`/logs/${record.id}`}>
+                        </CompactButton>
+                        <CompactLink href={`/logs/${record.id}`}>
                           Logs
-                        </Link>
-                      </div>
+                        </CompactLink>
+                      </RowActions>
                     </td>
                   </tr>
                   {editingRecord?.id === record.id && (
@@ -420,20 +399,21 @@ const RecordsTable = ({
                               />
                             ))}
                           <div className="actions">
-                            <StyledButton
+                            <CompactButton
                               type="submit"
-                              $btnclr="green"
+                              $variant="green"
                               disabled={isSaving}
                             >
                               {isSaving ? "Saving..." : "Save changes"}
-                            </StyledButton>
-                            <StyledButton
+                            </CompactButton>
+                            <CompactButton
                               type="button"
+                              $variant="neutral"
                               onClick={cancelEditing}
                               disabled={isSaving}
                             >
                               Cancel
-                            </StyledButton>
+                            </CompactButton>
                           </div>
                           {error && (
                             <p className="feedback" role="alert">
@@ -448,8 +428,8 @@ const RecordsTable = ({
               ))
             )}
           </tbody>
-        </table>
-      </TableWrap>
+        </ObjectTable>
+      </ObjectTableContainer>
     </>
   );
 };

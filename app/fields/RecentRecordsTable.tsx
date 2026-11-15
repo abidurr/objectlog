@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import styled from "styled-components";
 import { FiArrowDown, FiArrowUp } from "react-icons/fi";
 import type { getObjectsWithRecentRecords } from "@/app/actions";
+import {
+  ObjectTable,
+  ObjectTableContainer,
+} from "@/components/StyledBits";
 
 type ObjectData = Awaited<
   ReturnType<typeof getObjectsWithRecentRecords>
@@ -11,91 +14,6 @@ type ObjectData = Awaited<
 type RecordItem = ObjectData["records"][number];
 type FieldItem = ObjectData["fields"][number];
 type SortColumn = "name" | "createdAt" | `field:${string}`;
-
-const TableWrap = styled.div`
-  max-width: 100%;
-  overflow-x: auto;
-  border: 1px solid #d8ded8;
-  border-radius: 6px;
-  background: #fff;
-
-  table {
-    width: 100%;
-    min-width: 560px;
-    border-collapse: separate;
-    border-spacing: 0;
-    text-align: left;
-  }
-
-  th,
-  td {
-    padding: 11px 14px;
-    border-bottom: 1px solid #e6eae6;
-    vertical-align: top;
-    color: #152a22;
-  }
-
-  th {
-    background: #f3f6f2;
-    color: #3d4b40;
-    font-size: 0.82rem;
-    font-weight: 650;
-    white-space: nowrap;
-  }
-
-  th:first-child {
-    border-top-left-radius: 5px;
-  }
-
-  th:last-child {
-    border-top-right-radius: 5px;
-  }
-
-  th button {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    text-align: left;
-    cursor: pointer;
-  }
-
-  th button:hover {
-    color: #17653f;
-  }
-
-  th button:focus-visible {
-    outline: 2px solid #17653f;
-    outline-offset: 3px;
-  }
-
-  th button svg {
-    flex: none;
-    color: #657369;
-  }
-
-  tbody tr:nth-child(even) {
-    background: #fafbf9;
-  }
-
-  tbody tr:hover {
-    background: #eff5ef;
-  }
-
-  tbody tr:last-child > * {
-    border-bottom: 0;
-  }
-
-  tbody th[scope="row"] {
-    color: #202a22;
-    font-weight: 600;
-    text-align: left;
-  }
-`;
 
 function getComputedValue(recordFields: RecordItem["fields"], fieldId: string) {
   if (
@@ -161,7 +79,11 @@ const RecentRecordsTable = ({
     return sortDirection === "asc" ? comparison : -comparison;
   });
 
-  const renderHeader = (column: SortColumn, label: string) => {
+  const renderHeader = (
+    column: SortColumn,
+    label: string,
+    isNumeric = false,
+  ) => {
     const isActive = sortColumn === column;
     const nextDirection = isActive && sortDirection === "asc" ? "desc" : "asc";
     const SortIcon =
@@ -170,6 +92,7 @@ const RecentRecordsTable = ({
     return (
       <th
         key={column}
+        className={isNumeric ? "numeric-column" : undefined}
         scope="col"
         aria-sort={
           isActive
@@ -199,23 +122,43 @@ const RecentRecordsTable = ({
   };
 
   return (
-    <TableWrap>
-      <table>
+    <ObjectTableContainer>
+      <ObjectTable>
         <thead>
           <tr>
             {renderHeader("name", "Record")}
             {fields.map((field) =>
-              renderHeader(`field:${field.id}`, field.name),
+              renderHeader(
+                `field:${field.id}`,
+                field.name,
+                field.fieldType === "ROUNDNUMBER",
+              ),
             )}
             {renderHeader("createdAt", "Created")}
           </tr>
         </thead>
         <tbody>
-          {sortedRecords.map((record) => (
-            <tr key={record.id}>
-              <th scope="row">{record.name}</th>
+          {sortedRecords.map((record, index) => (
+            <tr
+              key={record.id}
+              className={
+                index === sortedRecords.length - 1
+                  ? "last-record-row"
+                  : undefined
+              }
+            >
+              <th scope="row" className="record-name-cell">
+                {record.name}
+              </th>
               {fields.map((field) => (
-                <td key={field.id}>
+                <td
+                  key={field.id}
+                  className={
+                    field.fieldType === "ROUNDNUMBER"
+                      ? "numeric-column"
+                      : undefined
+                  }
+                >
                   {getComputedValue(record.fields, field.id)}
                 </td>
               ))}
@@ -223,8 +166,8 @@ const RecentRecordsTable = ({
             </tr>
           ))}
         </tbody>
-      </table>
-    </TableWrap>
+      </ObjectTable>
+    </ObjectTableContainer>
   );
 };
 

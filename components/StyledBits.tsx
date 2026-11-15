@@ -27,6 +27,115 @@ export const ObjectBox = styled.div`
   }
 `;
 
+export const ObjectTableContainer = styled(ObjectBox)`
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 12px;
+`;
+
+export const ObjectTable = styled.table`
+  width: 100%;
+  min-width: 560px;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: left;
+
+  th,
+  td {
+    padding: 11px 14px;
+    border-bottom: 1px solid ${theme.PRIMARY_400};
+    vertical-align: top;
+    color: ${theme.BLACK_TEXT_COLOR};
+  }
+
+  th {
+    background: ${theme.DARK_COLOR_TEXT};
+    color: ${theme.PRIMARY_200};
+    font-size: 0.82rem;
+    font-weight: 650;
+    white-space: nowrap;
+  }
+
+  thead th:first-child {
+    border-top-left-radius: 6px;
+  }
+
+  thead th:last-child {
+    border-top-right-radius: 6px;
+  }
+
+  th:has(button) {
+    padding: 0;
+  }
+
+  th button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 42px;
+    box-sizing: border-box;
+    padding: 11px 14px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  th button:hover {
+    color: ${theme.PRIMARY_300};
+  }
+
+  th button:focus-visible {
+    outline: 2px solid ${theme.PRIMARY_200};
+    outline-offset: 3px;
+  }
+
+  th button svg {
+    flex: none;
+    color: ${theme.PRIMARY_200};
+  }
+
+  th.numeric-column,
+  td.numeric-column {
+    text-align: right;
+  }
+
+  th.numeric-column button {
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  tbody tr:nth-child(even) {
+    background: ${theme.PRIMARY_700};
+  }
+
+  tbody tr:hover {
+    background: ${theme.PRIMARY_600};
+  }
+
+  tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+
+  tbody th[scope="row"] {
+    font-weight: 600;
+    text-align: left;
+  }
+
+  tbody .record-name-cell {
+    background: ${theme.PRIMARY_800};
+  }
+
+  tbody tr.last-record-row > .record-name-cell {
+    border-bottom-left-radius: 6px;
+  }
+`;
+
 export const ColorPill = styled.div<{
   $textclr: string;
   $bgclr: string;
