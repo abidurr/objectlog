@@ -129,6 +129,7 @@ export const ObjectTable = styled.table`
 
   tbody .record-name-cell {
     background: ${theme.PRIMARY_800};
+    color: ${theme.BLACK_TEXT_COLOR};
   }
 
   tbody tr.last-record-row > .record-name-cell {
